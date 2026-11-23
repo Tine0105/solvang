@@ -57,19 +57,25 @@ def _build_mysql_uri() -> str:
 
 def _build_engine_options(db_uri: str) -> dict:
     options = {
+        'pool_size': int(os.environ.get('DB_POOL_SIZE', 5)),
+        'max_overflow': int(os.environ.get('DB_MAX_OVERFLOW', 5)),
+        'pool_timeout': int(os.environ.get('DB_POOL_TIMEOUT', 10)),
         'pool_pre_ping': True,
-        'pool_recycle': 280,
+        'pool_recycle': int(os.environ.get('DB_POOL_RECYCLE', 240)),
     }
     raw_url = os.environ.get('DATABASE_URL') or db_uri
+    connect_args = {}
+    if db_uri.startswith('mysql'):
+        connect_args['connect_timeout'] = int(os.environ.get('DB_CONNECT_TIMEOUT', 10))
     if _needs_ssl(raw_url):
         try:
             import certifi
             ca_path = certifi.where()
         except ImportError:
             ca_path = None
-        options['connect_args'] = {
-            'ssl': ssl.create_default_context(cafile=ca_path),
-        }
+        connect_args['ssl'] = ssl.create_default_context(cafile=ca_path)
+    if connect_args:
+        options['connect_args'] = connect_args
     return options
 
 

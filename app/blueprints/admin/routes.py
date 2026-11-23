@@ -8,11 +8,19 @@ from sqlalchemy import func
 from PIL import Image
 
 from app.blueprints.admin import admin_bp
+from app.cache import catalog_cache
 from app.decorators import admin_required
 from app.extensions import db
 from app.forms import BrandForm, CarForm, CarColorForm, OrderStatusForm, TestDriveStatusForm
 from app.models import Brand, Car, CarColor, CarImage, CarModel, Order, TestDriveRequest, User
 from scripts.inspect_glb import inspect_glb
+
+
+@admin_bp.after_request
+def _invalidate_catalog_cache(response):
+    if request.method == 'POST' and response.status_code < 400:
+        catalog_cache.invalidate()
+    return response
 from scripts.optimize_images import compute_dhash
 
 

@@ -1,15 +1,51 @@
 from flask import render_template, request
 from flask_login import current_user
 from sqlalchemy import or_
+from sqlalchemy.orm import defer, joinedload, selectinload
 
 from app.blueprints.cars import cars_bp
+from app.cache import catalog_cache
+from app.extensions import db
 from app.forms import OrderForm, TestDriveForm
-from app.models import Brand, Car, Favorite
+from app.models import Brand, Car, CarImage, Favorite
+
+
+def _load_brands():
+    brands = Brand.query.order_by(Brand.name.asc()).all()
+    db.session.expunge_all()
+    return brands
+
+
+def _load_car_detail(slug: str):
+    car = (
+        Car.query.options(
+            joinedload(Car.brand),
+            selectinload(Car.colors),
+            selectinload(Car.models_3d),
+            selectinload(Car.images).defer(CarImage.image_blob),
+        )
+        .filter_by(slug=slug)
+        .first_or_404()
+    )
+    related_cars = (
+        Car.query.options(
+            joinedload(Car.brand),
+            selectinload(Car.images).defer(CarImage.image_blob),
+        )
+        .filter(Car.brand_id == car.brand_id, Car.id != car.id)
+        .limit(3)
+        .all()
+    )
+    db.session.expunge_all()
+    return car, related_cars
 
 
 @cars_bp.route('/')
 def list_cars():
-    query = Car.query.join(Brand)
+    query = Car.query.options(
+        joinedload(Car.brand),
+        selectinload(Car.images).defer(CarImage.image_blob),
+    ).join(Brand)
 
     q = request.args.get('q', '').strip()
     brand_id = request.args.get('brand', type=int)
@@ -50,7 +86,7 @@ def list_cars():
         query = query.order_by(Car.created_at.desc())
 
     pagination = query.paginate(page=page, per_page=9, error_out=False)
-    brands = Brand.query.order_by(Brand.name.asc()).all()
+    brands = catalog_cache.get_or_set('brands:all', _load_brands, ttl=600)
 
     return render_template(
         'cars/list.html',
@@ -71,7 +107,9 @@ def list_cars():
 
 @cars_bp.route('/<slug>')
 def detail(slug):
-    car = Car.query.filter_by(slug=slug).first_or_404()
+    car, related_cars = catalog_cache.get_or_set(
+        f'car:detail:{slug}', lambda: _load_car_detail(slug), ttl=300
+    )
 
     is_favorite = False
     if current_user.is_authenticated:
@@ -85,12 +123,6 @@ def detail(slug):
         order_form.color_id.choices = [(0, 'Màu tiêu chuẩn')]
 
     test_drive_form = TestDriveForm()
-
-    related_cars = (
-        Car.query.filter(Car.brand_id == car.brand_id, Car.id != car.id)
-        .limit(3)
-        .all()
-    )
 
     return render_template(
         'cars/detail.html',

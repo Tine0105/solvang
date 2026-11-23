@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}500 — Lỗi hệ thống{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap" style="max-width: 600px;">
+    <span class="badge badge--danger">Lỗi 500</span>
+    <h1 style="margin-top: 16px;">Sự cố máy chủ</h1>
+    <p class="lead" style="margin-top: 12px;">Hệ thống gặp lỗi ngoài ý muốn. Vui lòng thử lại sau ít phút.</p>
+    <div class="btn-row" style="margin-top: 24px;">
+      <a href="{{ url_for('main.index') }}" class="btn btn--primary">Về trang chủ</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Quản lý đơn hàng — Admin Solvang{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: calc(var(--spacing-900) + var(--spacing-300));">
+  <div class="wrap">
+    <div class="section-head">
+      <h1>Quản lý đơn đặt mua</h1>
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn--secondary btn--sm">Dashboard</a>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Mẫu xe</th>
+            <th>Màu</th>
+            <th>Ghi chú</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in orders %}
+          <tr>
+            <td>#{{ o.id }}</td>
+            <td>{{ o.user.full_name }}<div class="label">{{ o.user.email }}</div></td>
+            <td>{{ o.car.name }}</td>
+            <td>{{ o.color.color_name if o.color else 'Tiêu chuẩn' }}</td>
+            <td>{{ o.note or '—' }}</td>
+            <td>
+              <form action="{{ url_for('admin.update_order_status', order_id=o.id) }}" method="post" style="display: flex; gap: 8px; align-items: center;">
+                {{ form.hidden_tag() }}
+                <select name="status" class="input" style="min-height: 36px; width: auto;">
+                  <option value="pending" {% if o.status == 'pending' %}selected{% endif %}>Chờ xác nhận</option>
+                  <option value="confirmed" {% if o.status == 'confirmed' %}selected{% endif %}>Đã xác nhận</option>
+                  <option value="cancelled" {% if o.status == 'cancelled' %}selected{% endif %}>Đã hủy</option>
+                </select>
+                <button type="submit" class="btn btn--secondary btn--sm">Lưu</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

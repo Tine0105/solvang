@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Quản lý lịch lái thử — Admin Solvang{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: calc(var(--spacing-900) + var(--spacing-300));">
+  <div class="wrap">
+    <div class="section-head">
+      <h1>Quản lý lịch lái thử</h1>
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn--secondary btn--sm">Dashboard</a>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Mã lịch</th>
+            <th>Khách hàng</th>
+            <th>Mẫu xe</th>
+            <th>Ngày hẹn</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for td in test_drives %}
+          <tr>
+            <td>#{{ td.id }}</td>
+            <td>{{ td.user.full_name }}<div class="label">{{ td.user.email }}</div></td>
+            <td>{{ td.car.name }}</td>
+            <td>{{ td.preferred_date.strftime('%d/%m/%Y') }}</td>
+            <td>
+              <form action="{{ url_for('admin.update_test_drive_status', req_id=td.id) }}" method="post" style="display: flex; gap: 8px; align-items: center;">
+                {{ form.hidden_tag() }}
+                <select name="status" class="input" style="min-height: 36px; width: auto;">
+                  <option value="pending" {% if td.status == 'pending' %}selected{% endif %}>Chờ duyệt</option>
+                  <option value="confirmed" {% if td.status == 'confirmed' %}selected{% endif %}>Đã xác nhận</option>
+                  <option value="completed" {% if td.status == 'completed' %}selected{% endif %}>Hoàn thành</option>
+                  <option value="cancelled" {% if td.status == 'cancelled' %}selected{% endif %}>Đã hủy</option>
+                </select>
+                <button type="submit" class="btn btn--secondary btn--sm">Lưu</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

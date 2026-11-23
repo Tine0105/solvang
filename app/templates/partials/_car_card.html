@@ -1,0 +1,43 @@
+{% macro render_car_card(car) %}
+{% set hero = car.hero_image %}
+{% set img_url = hero.image_url if hero else car.thumbnail %}
+{% set base_no_ext = img_url[:-5] if img_url.endswith('.webp') else (img_url[:-4] if img_url.endswith('.jpg') else img_url) %}
+<article class="car-card">
+  <a href="{{ url_for('cars.detail', slug=car.slug) }}" class="car-card__media">
+    <picture>
+      {% if img_url.endswith('.webp') and not img_url.endswith('-thumb.webp') %}
+        <source
+          type="image/webp"
+          srcset="{{ base_no_ext }}-768w.webp 768w, {{ base_no_ext }}-1280w.webp 1280w, {{ img_url }} 1920w"
+          sizes="(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 33vw"
+        >
+        <img src="{{ base_no_ext }}.jpg" alt="{{ car.brand.name }} {{ car.name }}" loading="lazy">
+      {% else %}
+        <img src="{{ img_url }}" alt="{{ car.brand.name }} {{ car.name }}" loading="lazy">
+      {% endif %}
+    </picture>
+  </a>
+  <div class="car-card__body">
+    <div class="car-card__meta">
+      <span class="caption-1 muted">{{ car.brand.name }} · {{ car.year }}</span>
+      <span class="badge caption-3">{{ car.fuel_type }}</span>
+    </div>
+    <h3 class="title-1 car-card__title">
+      <a href="{{ url_for('cars.detail', slug=car.slug) }}">{{ car.name | replace('-', ' ') }}</a>
+    </h3>
+    <div class="car-card__meta">
+      <span class="body-6 muted">{{ car.body_type }} · {{ car.seats }} chỗ ngồi</span>
+      <span class="caption-2 muted">{{ 'Sẵn xe giao ngay' if car.stock > 0 else 'Đang tạm hết' }}</span>
+    </div>
+    <div class="car-card__footer">
+      <div class="car-card__price title-2">{{ car.price | vnd }}</div>
+      <a href="{{ url_for('cars.detail', slug=car.slug) }}" class="btn btn--secondary btn--sm">Xem cấu hình 3D</a>
+    </div>
+    {% if hero and hero.author %}
+      <div class="car-card__credit caption-5 muted" title="Nguồn: {{ hero.source_name or 'Open License' }}">
+        Ảnh: {{ hero.author | truncate(28, True) }} / {{ hero.license or 'CC' }}
+      </div>
+    {% endif %}
+  </div>
+</article>
+{% endmacro %}

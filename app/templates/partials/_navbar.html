@@ -1,0 +1,58 @@
+<header class="site-nav-host">
+  <div class="wrap site-nav-wrap">
+    <div class="site-nav">
+      <a class="brand-mark title-3" href="{{ url_for('main.index') }}">
+        <span class="brand-mark__icon" aria-hidden="true"><span class="brand-mark__dot"></span></span>
+        <span>Solvang</span>
+      </a>
+
+      <nav class="site-nav__menu" aria-label="Điều hướng chính">
+        <ul class="nav-links">
+          <li><a class="title-4" href="{{ url_for('main.index') }}" {% if request.endpoint == 'main.index' %}aria-current="page"{% endif %}>Trang chủ</a></li>
+          <li><a class="title-4" href="{{ url_for('cars.list_cars') }}" {% if request.endpoint and request.endpoint.startswith('cars.') %}aria-current="page"{% endif %}>Bộ sưu tập</a></li>
+          <li><a class="title-4" href="{{ url_for('main.credits') }}" {% if request.endpoint == 'main.credits' %}aria-current="page"{% endif %}>Bản quyền</a></li>
+          <li><a class="title-4" href="{{ url_for('orders.my_test_drives') }}" {% if request.endpoint == 'orders.my_test_drives' %}aria-current="page"{% endif %}>Lái thử</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="{{ url_for('cars.list_cars') }}" class="btn btn--primary btn--sm btn--hide-mobile">Xem 12 mẫu xe</a>
+        <button type="button" class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="overlay-menu" aria-label="Mở bảng điều hướng">
+          <span class="nav-toggle__lines" aria-hidden="true"><span></span><span></span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div id="overlay-menu" class="overlay-menu" data-overlay-menu hidden>
+  <div class="overlay-menu__inner wrap">
+    <div class="overlay-menu__head">
+      <span class="caption-1 muted">Điều hướng hệ thống</span>
+      <button type="button" class="btn btn--secondary btn--sm" data-overlay-close aria-label="Đóng bảng điều hướng">Đóng</button>
+    </div>
+    <ul class="overlay-menu__list">
+      <li><a class="heading-3" href="{{ url_for('main.index') }}" data-overlay-item>Trang chủ</a></li>
+      <li><a class="heading-3" href="{{ url_for('cars.list_cars') }}" data-overlay-item>Bộ sưu tập 12 mẫu xe</a></li>
+      <li><a class="heading-3" href="{{ url_for('main.credits') }}" data-overlay-item>Bản quyền và nguồn tài nguyên</a></li>
+      {% if current_user.is_authenticated %}
+        <li><a class="heading-3" href="{{ url_for('orders.favorites') }}" data-overlay-item>Danh sách xe yêu thích</a></li>
+        <li><a class="heading-3" href="{{ url_for('orders.my_orders') }}" data-overlay-item>Đơn đặt mua của tôi</a></li>
+        <li><a class="heading-3" href="{{ url_for('orders.my_test_drives') }}" data-overlay-item>Lịch hẹn lái thử</a></li>
+        <li><a class="heading-3" href="{{ url_for('auth.profile') }}" data-overlay-item>Hồ sơ cá nhân ({{ current_user.full_name }})</a></li>
+        {% if current_user.is_admin %}
+          <li><a class="heading-3" href="{{ url_for('admin.dashboard') }}" data-overlay-item>Bảng điều khiển quản trị</a></li>
+        {% endif %}
+      {% else %}
+        <li><a class="heading-3" href="{{ url_for('auth.login') }}" data-overlay-item>Đăng nhập tài khoản</a></li>
+        <li><a class="heading-3" href="{{ url_for('auth.register') }}" data-overlay-item>Tạo tài khoản mới</a></li>
+      {% endif %}
+    </ul>
+    {% if current_user.is_authenticated %}
+      <form action="{{ url_for('auth.logout') }}" method="post" style="margin-top: var(--spacing-300);">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn--secondary">Đăng xuất khỏi hệ thống</button>
+      </form>
+    {% endif %}
+  </div>
+</div>

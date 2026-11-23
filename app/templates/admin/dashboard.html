@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Quản trị hệ thống — Solvang{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: calc(var(--spacing-900) + var(--spacing-300));">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h1>Bảng điều khiển Admin</h1>
+        <p class="muted" style="margin-top: 8px;">Thống kê kho xe, đơn đặt mua và lịch lái thử.</p>
+      </div>
+      <div class="btn-row">
+        <a href="{{ url_for('admin.cars') }}" class="btn btn--primary btn--sm">Quản lý xe</a>
+        <a href="{{ url_for('admin.brands') }}" class="btn btn--secondary btn--sm">Hãng xe</a>
+        <a href="{{ url_for('admin.orders') }}" class="btn btn--secondary btn--sm">Đơn hàng</a>
+        <a href="{{ url_for('admin.test_drives') }}" class="btn btn--secondary btn--sm">Lịch lái thử</a>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">Tổng mẫu xe</div>
+        <div class="stat-card__value">{{ stats.total_cars }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Đơn chờ xác nhận</div>
+        <div class="stat-card__value">{{ stats.pending_orders }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Lịch lái thử chờ duyệt</div>
+        <div class="stat-card__value">{{ stats.pending_test_drives }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Doanh thu đã xác nhận</div>
+        <div class="stat-card__value" style="font-size: 24px;">{{ stats.confirmed_revenue | vnd }}</div>
+      </div>
+    </div>
+
+    <div class="detail-grid" style="grid-template-columns: 1fr 1fr;">
+      <div>
+        <h2 style="font-size: 24px; margin-bottom: 16px;">Đơn đặt mua gần đây</h2>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>#</th><th>Khách hàng</th><th>Xe</th><th>Trạng thái</th></tr>
+            </thead>
+            <tbody>
+              {% for o in recent_orders %}
+              <tr>
+                <td>#{{ o.id }}</td>
+                <td>{{ o.user.full_name }}</td>
+                <td>{{ o.car.name }}</td>
+                <td><span class="badge">{{ o.status }}</span></td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" class="muted">Chưa có đơn hàng.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <h2 style="font-size: 24px; margin-bottom: 16px;">Lịch lái thử gần đây</h2>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>#</th><th>Khách hàng</th><th>Xe</th><th>Ngày</th></tr>
+            </thead>
+            <tbody>
+              {% for td in recent_test_drives %}
+              <tr>
+                <td>#{{ td.id }}</td>
+                <td>{{ td.user.full_name }}</td>
+                <td>{{ td.car.name }}</td>
+                <td>{{ td.preferred_date.strftime('%d/%m/%Y') }}</td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" class="muted">Chưa có lịch lái thử.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

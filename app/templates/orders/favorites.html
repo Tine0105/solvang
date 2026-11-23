@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% from 'partials/_car_card.html' import render_car_card %}
+
+{% block title %}Xe yêu thích — Solvang{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: calc(var(--spacing-900) + var(--spacing-300));">
+  <div class="wrap">
+    <div class="section-head">
+      <h1>Xe yêu thích</h1>
+      <a href="{{ url_for('cars.list_cars') }}" class="btn btn--secondary">Khám phá thêm</a>
+    </div>
+
+    {% if favorites %}
+      <div class="cards-grid">
+        {% for fav in favorites %}
+          {{ render_car_card(fav.car) }}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="panel">
+        <p class="muted">Bạn chưa lưu mẫu xe nào vào danh sách yêu thích.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

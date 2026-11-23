@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'Sửa xe: ' + car.name if car else 'Thêm xe mới' }} — Admin Solvang{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: calc(var(--spacing-900) + var(--spacing-300));">
+  <div class="wrap">
+    <div class="section-head">
+      <h1>{{ 'Cập nhật xe: ' + car.name if car else 'Thêm mẫu xe mới' }}</h1>
+      <a href="{{ url_for('admin.cars') }}" class="btn btn--secondary btn--sm">Quay lại danh sách</a>
+    </div>
+
+    <div class="detail-grid" style="grid-template-columns: {{ '1.4fr 1fr' if car else '1fr' }};">
+      <div class="panel">
+        <form method="post" enctype="multipart/form-data" class="form-grid" novalidate>
+          {{ form.hidden_tag() }}
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="field">
+              <label for="car-brand">{{ form.brand_id.label.text }}</label>
+              {{ form.brand_id(id='car-brand', class='input') }}
+              {% for e in form.brand_id.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              <label for="car-name">{{ form.name.label.text }}</label>
+              {{ form.name(id='car-name', class='input') }}
+              {% for e in form.name.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="field">
+              <label for="car-slug">{{ form.slug.label.text }}</label>
+              {{ form.slug(id='car-slug', class='input', placeholder='aurelia-gt-2026') }}
+              {% for e in form.slug.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              <label for="car-price">{{ form.price.label.text }}</label>
+              {{ form.price(id='car-price', class='input') }}
+              {% for e in form.price.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+            <div class="field">
+              <label for="car-year">{{ form.year.label.text }}</label>
+              {{ form.year(id='car-year', class='input') }}
+              {% for e in form.year.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              <label for="car-seats">{{ form.seats.label.text }}</label>
+              {{ form.seats(id='car-seats', class='input') }}
+              {% for e in form.seats.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              <label for="car-stock">{{ form.stock.label.text }}</label>
+              {{ form.stock(id='car-stock', class='input') }}
+              {% for e in form.stock.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              <label for="car-mileage">{{ form.mileage.label.text }}</label>
+              {{ form.mileage(id='car-mileage', class='input') }}
+              {% for e in form.mileage.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+            <div class="field">
+              <label for="car-fuel">{{ form.fuel_type.label.text }}</label>
+              {{ form.fuel_type(id='car-fuel', class='input') }}
+              {% for e in form.fuel_type.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              <label for="car-trans">{{ form.transmission.label.text }}</label>
+              {{ form.transmission(id='car-trans', class='input') }}
+              {% for e in form.transmission.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              <label for="car-body">{{ form.body_type.label.text }}</label>
+              {{ form.body_type(id='car-body', class='input') }}
+              {% for e in form.body_type.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="car-desc">{{ form.description.label.text }}</label>
+            {{ form.description(id='car-desc', class='input') }}
+            {% for e in form.description.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="field">
+              <label for="car-thumb">{{ form.thumbnail_file.label.text }}</label>
+              {{ form.thumbnail_file(id='car-thumb', class='input') }}
+              {% for e in form.thumbnail_file.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+            <div class="field">
+              <label for="car-model">{{ form.model_file.label.text }}</label>
+              {{ form.model_file(id='car-model', class='input', accept='.glb') }}
+              {% for e in form.model_file.errors %}<span class="field__error">{{ e }}</span>{% endfor %}
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="car-gallery">{{ form.gallery_files.label.text }}</label>
+            {{ form.gallery_files(id='car-gallery', class='input', multiple=true) }}
+          </div>
+
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            {{ form.is_featured() }}
+            <span>{{ form.is_featured.label.text }}</span>
+          </label>
+
+          <button type="submit" class="btn btn--primary">{{ form.submit.label.text }}</button>
+        </form>
+      </div>
+
+      {% if car and color_form %}
+      <div class="panel">
+        <h2 style="font-size: 22px; margin-bottom: 16px;">Bảng màu sơn 3D</h2>
+        <div class="rows" style="margin-bottom: 20px;">
+          {% for c in car.colors %}
+            <div class="rows__item">
+              <span style="display: inline-flex; align-items: center; gap: 10px;">
+                <span style="width: 18px; height: 18px; border-radius: 50%; background: {{ c.hex_code }}; border: 1px solid var(--line-strong);"></span>
+                <span>{{ c.color_name }} ({{ c.hex_code }})</span>
+              </span>
+              <form action="{{ url_for('admin.delete_car_color', color_id=c.id) }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn--secondary btn--sm">Xóa</button>
+              </form>
+            </div>
+          {% endfor %}
+        </div>
+
+        <form action="{{ url_for('admin.add_car_color', car_id=car.id) }}" method="post" class="form-grid">
+          {{ color_form.hidden_tag() }}
+          <div class="field">
+            <label for="color-name">{{ color_form.color_name.label.text }}</label>
+            {{ color_form.color_name(id='color-name', class='input', placeholder='Xám Titan') }}
+          </div>
+          <div class="field">
+            <label for="color-hex">{{ color_form.hex_code.label.text }}</label>
+            {{ color_form.hex_code(id='color-hex', class='input', placeholder='#4B5563') }}
+          </div>
+          <button type="submit" class="btn btn--secondary">Thêm màu sơn</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if car %}
+    <div class="panel" style="margin-top: 32px;">
+      <h2 style="font-size: 22px; margin-bottom: 16px;">Quản lý Mô hình 3D (.glb) ({{ car.models_3d|length }})</h2>
+      {% if car.models_3d %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tệp (.glb)</th>
+                <th>Tam giác / Dung lượng</th>
+                <th>Material sơn thân</th>
+                <th>Tác giả &amp; License</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for m in car.models_3d %}
+                <tr>
+                  <td><code>{{ m.file_path }}</code></td>
+                  <td>{{ "{:,}".format(m.poly_count or 0) }} tris · {{ ((m.file_size or 0) / 1048576) | round(2) }} MB</td>
+                  <td><code>{{ (m.body_material_names or []) | join(', ') }}</code></td>
+                  <td>{{ m.author }} · <span class="badge">{{ m.license }}</span></td>
+                  <td>
+                    <span class="badge {{ 'badge--success' if m.is_active else '' }}">
+                      {{ 'Đang dùng' if m.is_active else 'Tắt' }}
+                    </span>
+                  </td>
+                  <td>
+                    <form action="{{ url_for('admin.toggle_car_model', model_id=m.id) }}" method="post">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button type="submit" class="btn btn--secondary btn--sm">
+                        {{ 'Tắt' if m.is_active else 'Kích hoạt' }}
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="muted">Chưa có bản ghi mô hình 3D nào cho xe này.</p>
+      {% endif %}
+    </div>
+
+    <div class="panel" style="margin-top: 32px;">
+      <h2 style="font-size: 22px; margin-bottom: 16px;">Thư viện ảnh chụp ({{ car.images|length }})</h2>
+      {% if car.images %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Xem trước</th>
+                <th>Góc chụp / Tệp</th>
+                <th>Kích thước / Khớp</th>
+                <th>Tác giả / License</th>
+                <th>Thứ tự</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for img in car.images %}
+                <tr>
+                  <td><img src="{{ img.image_url }}" alt="" style="width: 84px; height: 54px; object-fit: cover; border-radius: 4px;"></td>
+                  <td>
+                    <span class="badge {{ 'badge--success' if img.is_hero else '' }}">{{ 'HERO' if img.is_hero else img.shot_type }}</span>
+                    <div class="muted" style="font-size: 12px; margin-top: 4px;"><code>{{ img.image_url }}</code></div>
+                  </td>
+                  <td>{{ img.width or '—' }}×{{ img.height or '—' }} · <span class="badge">{{ img.match_level }}</span></td>
+                  <td>{{ img.author or '—' }}<br><span class="muted" style="font-size: 12px;">{{ img.license }}</span></td>
+                  <td>
+                    <form action="{{ url_for('admin.update_image_sort', image_id=img.id) }}" method="post" style="display: flex; gap: 6px; align-items: center;">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <input type="number" name="sort_order" value="{{ img.sort_order }}" class="input" style="width: 68px; padding: 4px 8px;">
+                      <button type="submit" class="btn btn--secondary btn--sm">Lưu</button>
+                    </form>
+                  </td>
+                  <td>
+                    <span class="badge {{ 'badge--success' if img.is_active else 'badge--danger' }}">
+                      {{ 'Hiển thị' if img.is_active else 'Ẩn' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                      {% if not img.is_hero %}
+                        <form action="{{ url_for('admin.set_hero_image', image_id=img.id) }}" method="post">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <button type="submit" class="btn btn--secondary btn--sm">Đặt Hero</button>
+                        </form>
+                      {% endif %}
+                      <form action="{{ url_for('admin.toggle_image_active', image_id=img.id) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn--secondary btn--sm">{{ 'Ẩn' if img.is_active else 'Hiện' }}</button>
+                      </form>
+                      <form action="{{ url_for('admin.delete_car_image', image_id=img.id) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn--secondary btn--sm">Xóa</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="muted">Chưa có ảnh nào trong thư viện.</p>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

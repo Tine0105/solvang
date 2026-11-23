@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Nguồn tài nguyên và bản quyền — Solvang{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: calc(var(--spacing-900) + var(--spacing-300));">
+  <div class="wrap">
+    <div class="section-head">
+      <div style="max-width: 680px;">
+        <div class="caption-3">Truy xuất trực tiếp từ cơ sở dữ liệu MySQL</div>
+        <h1 class="heading-2" style="margin-top: var(--spacing-75);">Tài nguyên mô hình 3D, hình ảnh và HDRI</h1>
+        <p class="body-3 muted" style="margin-top: var(--spacing-100);">
+          Toàn bộ {{ total_models }} mô hình 3D (<code>.glb</code>), {{ total_images }} ảnh chụp thực tế và {{ hdris|length }} môi trường ánh sáng HDRI trên Solvang đều sử dụng giấy phép mở hợp lệ.
+        </p>
+      </div>
+    </div>
+
+    {% for car in cars %}
+      <div class="panel" style="margin-top: var(--spacing-400);" data-reveal>
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: var(--spacing-100); margin-bottom: var(--spacing-200);">
+          <div>
+            <div class="caption-3">{{ car.brand.name | replace('-', ' ') }} · {{ car.year }} · {{ car.body_type }}</div>
+            <h2 class="heading-5" style="margin-top: var(--spacing-50);">
+              <a href="{{ url_for('cars.detail', slug=car.slug) }}" style="text-decoration: underline;">{{ car.name | replace('-', ' ') }}</a>
+            </h2>
+          </div>
+          <span class="badge caption-3">{{ car.slug }}</span>
+        </div>
+
+        <h3 class="title-3 muted" style="margin-bottom: var(--spacing-100);">Mô hình 3D (.glb)</h3>
+        {% if car.models_3d %}
+          <div class="table-wrap" style="margin-bottom: var(--spacing-300);">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tệp cục bộ</th>
+                  <th>Số tam giác / Dung lượng</th>
+                  <th>Tác giả</th>
+                  <th>Nguồn</th>
+                  <th>Giấy phép</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for m in car.models_3d %}
+                  <tr>
+                    <td><code>{{ m.file_path }}</code></td>
+                    <td class="mono-num">{{ "{:,}".format(m.poly_count or 0) }} tam giác · {{ ((m.file_size or 0) / 1048576) | round(2) }} MB</td>
+                    <td>{{ m.author }}</td>
+                    <td>
+                      <a href="{{ m.source_url }}" target="_blank" rel="noopener noreferrer" style="color: var(--text-info); text-decoration: underline;">
+                        {{ m.source_name }}
+                      </a>
+                    </td>
+                    <td>
+                      {% if m.license_url %}
+                        <a href="{{ m.license_url }}" target="_blank" rel="noopener noreferrer" class="badge badge--success">{{ m.license }}</a>
+                      {% else %}
+                        <span class="badge badge--success">{{ m.license }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="body-6 muted" style="margin-bottom: var(--spacing-200);">Chưa có mô hình 3D trong bảng <code>car_models</code>.</p>
+        {% endif %}
+
+        <h3 class="title-3 muted" style="margin-bottom: var(--spacing-100);">Bộ ảnh chụp thực tế ({{ car.active_images|length }})</h3>
+        {% if car.active_images %}
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Góc chụp</th>
+                  <th>Tệp cục bộ</th>
+                  <th>Kích thước</th>
+                  <th>Mức khớp</th>
+                  <th>Tác giả</th>
+                  <th>Nguồn và giấy phép</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for img in car.active_images %}
+                  <tr>
+                    <td><span class="badge {{ 'badge--success' if img.is_hero else '' }}">{{ 'Ảnh chính' if img.is_hero else (img.shot_type or 'gallery') }}</span></td>
+                    <td><code>{{ img.image_url }}</code></td>
+                    <td class="muted mono-num">{{ img.width or '' }}×{{ img.height or '' }}</td>
+                    <td><span class="badge">{{ img.match_level or 'exact' }}</span></td>
+                    <td>{{ img.author or '' }}</td>
+                    <td>
+                      {% if img.source_url %}
+                        <a href="{{ img.source_url }}" target="_blank" rel="noopener noreferrer" style="color: var(--text-info); text-decoration: underline;">
+                          {{ img.source_name or 'Nguồn gốc' }}
+                        </a>
+                      {% endif %}
+                      · <span class="badge badge--success">{{ img.license or 'CC' }}</span>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="body-6 muted">Chưa có ảnh chụp cho mẫu xe này.</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <div class="panel" style="margin-top: var(--spacing-500);" data-reveal>
+      <h2 class="heading-5" style="margin-bottom: var(--spacing-200);">Môi trường ánh sáng HDRI 2K ({{ hdris|length }})</h2>
+      {% if hdris %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tệp cục bộ</th>
+                <th>Tác giả</th>
+                <th>Nguồn</th>
+                <th>Giấy phép</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for h in hdris %}
+                <tr>
+                  <td><code>{{ h.local_path }}</code></td>
+                  <td>{{ h.author }}</td>
+                  <td><a href="{{ h.source_url }}" target="_blank" rel="noopener noreferrer" style="color: var(--text-info); text-decoration: underline;">{{ h.source_name }}</a></td>
+                  <td><a href="{{ h.license_url }}" target="_blank" rel="noopener noreferrer" class="badge badge--success">{{ h.license }}</a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

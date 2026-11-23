@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Đơn đặt mua của tôi — Solvang{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: calc(var(--spacing-900) + var(--spacing-300));">
+  <div class="wrap">
+    <div class="section-head">
+      <h1>Đơn đặt mua của tôi</h1>
+      <a href="{{ url_for('cars.list_cars') }}" class="btn btn--secondary">Xem bộ sưu tập</a>
+    </div>
+
+    {% if orders %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Mã đơn</th>
+              <th>Mẫu xe</th>
+              <th>Màu sơn</th>
+              <th>Giá niêm yết</th>
+              <th>Trạng thái</th>
+              <th>Ngày đặt</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in orders %}
+            <tr>
+              <td>#{{ o.id }}</td>
+              <td><a href="{{ url_for('cars.detail', slug=o.car.slug) }}" style="color: var(--action);">{{ o.car.brand.name }} {{ o.car.name }}</a></td>
+              <td>{{ o.color.color_name if o.color else 'Màu tiêu chuẩn' }}</td>
+              <td>{{ o.car.price | vnd }}</td>
+              <td>
+                {% if o.status == 'confirmed' %}
+                  <span class="badge badge--success">Đã xác nhận</span>
+                {% elif o.status == 'cancelled' %}
+                  <span class="badge badge--danger">Đã hủy</span>
+                {% else %}
+                  <span class="badge badge--accent">Chờ xác nhận</span>
+                {% endif %}
+              </td>
+              <td>{{ o.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="panel">
+        <p class="muted">Bạn chưa có đơn đặt mua nào.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

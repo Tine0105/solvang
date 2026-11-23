@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+{% from 'partials/_car_card.html' import render_car_card %}
+
+{% block title %}Solvang — Trải nghiệm và đặt mua xe thể thao 3D{% endblock %}
+
+{% set hero_img_obj = hero_car.hero_image if hero_car else None %}
+{% set hero_img_url = hero_img_obj.image_url if hero_img_obj else (hero_car.thumbnail.replace('-thumb.webp', '.webp') if hero_car and hero_car.thumbnail else '') %}
+{% set hero_base = hero_img_url[:-5] if hero_img_url.endswith('.webp') else hero_img_url %}
+
+{% block head_extra %}
+  {% if hero_img_url %}
+    <link rel="preload" as="image" href="{{ hero_img_url }}">
+  {% endif %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Mô hình 3D trên Solvang có đúng với kích thước và thiết kế xe thật không?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tất cả 12 mẫu xe đều sử dụng mô hình 3D glTF của xe thật ngoài đời với độ chi tiết từ 38.912 đến 489.304 tam giác, đã qua kiểm định tỷ lệ kích thước dài, rộng và cao."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Đặt lịch lái thử trực tuyến có tốn phí hoặc cần đặt cọc không?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Hoàn toàn miễn phí. Bạn không cần thanh toán hay đặt cọc trực tuyến khi đăng ký lịch hẹn lái thử tại showroom Quận 1."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Tôi có thể hủy hoặc đổi ngày lái thử sau khi đã đặt không?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Bạn có thể dời lịch hoặc hủy hẹn miễn phí bất cứ lúc nào trước giờ hẹn tối thiểu 24 giờ trong trang Quản lý lịch lái thử."
+        }
+      }
+    ]
+  }
+  </script>
+{% endblock %}
+
+{% block content %}
+<!-- 2. HERO 2 CỘT (Desktop) -->
+<section class="section hero-section">
+  <div class="wrap">
+    <div class="hero-layout">
+      <div class="hero-header">
+        <span class="badge badge--accent caption-3">Showroom 3D glTF · {{ total_cars }} mẫu xe thật</span>
+        <h1 class="heading-1 hero-title">
+          Trải nghiệm và đặt mua xe thể thao thật<br class="desktop-br"> ngay trên trình duyệt 3D
+        </h1>
+        <p class="body-2 muted hero-subtitle">
+          Xem chi tiết {{ total_cars }} mẫu xe thật với mô hình 3D từ 38.912 đến 489.304 tam giác, đổi màu sơn ngoại thất trực tiếp và đặt lịch lái thử tại Quận 1.
+        </p>
+        <div class="btn-row">
+          <a href="{{ url_for('cars.list_cars') }}" class="btn btn--primary button-md">Khám phá 12 mẫu xe</a>
+          <a href="{{ url_for('main.credits') }}" class="btn btn--secondary button-md">Xem nguồn bản quyền</a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="heading-4 mono-num">{{ total_cars }}</div>
+            <div class="caption-2 muted">Mẫu xe thật</div>
+          </div>
+          <div class="hero-stat">
+            <div class="heading-4 mono-num">78</div>
+            <div class="caption-2 muted">Ảnh thực tế</div>
+          </div>
+          <div class="hero-stat">
+            <div class="heading-4 mono-num">489.304</div>
+            <div class="caption-2 muted">Tam giác tối đa</div>
+          </div>
+        </div>
+      </div>
+
+      {% if hero_car %}
+      <div class="hero-frame">
+        <div class="hero-frame__media">
+          <picture>
+            {% if hero_img_url.endswith('.webp') %}
+              <source
+                type="image/webp"
+                srcset="{{ hero_base }}-768w.webp 768w, {{ hero_base }}-1280w.webp 1280w, {{ hero_base }}-1920w.webp 1920w, {{ hero_img_url }} 2400w"
+                sizes="(max-width: 1024px) 100vw, 560px"
+              >
+              <img src="{{ hero_base }}.jpg" alt="{{ hero_car.name }}" fetchpriority="high">
+            {% else %}
+              <img src="{{ hero_img_url }}" alt="{{ hero_car.name }}" fetchpriority="high">
+            {% endif %}
+          </picture>
+        </div>
+        <div class="hero-frame__bar">
+          <div>
+            <span class="caption-2 muted">Mẫu xe tiêu điểm · {{ hero_car.brand.name }} · {{ hero_car.year }}</span>
+            <div class="title-2" style="margin-top: var(--spacing-25);">{{ hero_car.name | replace('-', ' ') }} · {{ hero_car.price | vnd }}</div>
+          </div>
+          <a href="{{ url_for('cars.detail', slug=hero_car.slug) }}" class="btn btn--secondary btn--sm">Mở trình xem 3D</a>
+        </div>
+        {% if hero_img_obj and hero_img_obj.author %}
+          <div class="caption-5 muted" style="margin-top: var(--spacing-75);">
+            Ảnh thực tế: <a href="{{ hero_img_obj.source_url }}" target="_blank" rel="noopener noreferrer" style="text-decoration: underline;">{{ hero_img_obj.author }}</a> / {{ hero_img_obj.license }}
+          </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- 3. DẢI THƯƠNG HIỆU (Marquee 1 hàng ngang trên nền #F7F7F5) -->
+<section class="brand-marquee-band" aria-label="Các thương hiệu xe phân phối">
+  <div class="wrap">
+    <div class="brand-marquee">
+      <div class="brand-marquee__track">
+        {% for _ in range(2) %}
+          {% for brand in brands %}
+            <a href="{{ url_for('cars.list_cars', brand=brand.id) }}" class="proof-brand caption-3">
+              <img src="{{ brand.logo or url_for('static', filename='img/brands/default.svg') }}" alt="{{ brand.name }}" width="20" height="20">
+              <span>{{ brand.name | replace('-', ' ') }}</span>
+            </a>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. TAGLINE REVEAL (Chữ lớn tối màu trên nền trắng) -->
+<section class="section tagline-section">
+  <div class="wrap">
+    <h2 class="heading-2 tagline-reveal" data-tagline-reveal>
+      Mọi góc khuất ngoại thất, chất liệu sơn và thông số vận hành đều được phơi bày minh bạch dưới ánh sáng studio 2K trước khi bạn bước vào khoang lái
+    </h2>
+  </div>
+</section>
+
+<!-- 5. LỢI ÍCH: BENTO GRID 4 Ô BẤT ĐỐI XỨNG TRÊN NỀN #F7F7F5 -->
+<section class="section section--surface">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div style="max-width: 680px;">
+        <h2 class="heading-3">Xem xét từng chi tiết kỹ thuật trước khi đến showroom</h2>
+        <p class="body-3 muted" style="margin-top: var(--spacing-100);">
+          Thay vì xem ảnh quảng cáo đã qua chỉnh sửa, bạn trực tiếp kiểm tra tỷ lệ thân xe, đổi màu sơn ngoại thất và đối chiếu bộ ảnh thực tế ngay tại nhà.
+        </p>
+      </div>
+    </div>
+
+    <div class="bento-grid" data-reveal>
+      <article class="bento-card bento-card--wide">
+        <div class="icon-box" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+            <line x1="12" y1="22.08" x2="12" y2="12"/>
+          </svg>
+        </div>
+        <h3 class="heading-5" style="margin-top: var(--spacing-200);">Kiểm tra ngoại thất 360 độ với độ chi tiết tới 489.304 tam giác</h3>
+        <p class="body-3 muted" style="margin-top: var(--spacing-75);">
+          Xoay và phóng to từng đường gân khí động học, hốc gió và cụm phanh trên mô hình glTF thật được chiếu sáng bằng môi trường HDRI 2K từ Poly Haven.
+        </p>
+      </article>
+
+      <article class="bento-card">
+        <div class="icon-box" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
+            <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+            <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
+            <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+          </svg>
+        </div>
+        <h3 class="heading-5" style="margin-top: var(--spacing-200);">Đổi màu sơn chuẩn xác trên thân vỏ</h3>
+        <p class="body-3 muted" style="margin-top: var(--spacing-75);">
+          Tách biệt vật liệu sơn thân xe với kính, mâm hợp kim và lốp để hiển thị độ bóng clearcoat trung thực nhất.
+        </p>
+      </article>
+
+      <article class="bento-card">
+        <div class="icon-box" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+            <circle cx="12" cy="13" r="3"/>
+          </svg>
+        </div>
+        <h3 class="heading-5" style="margin-top: var(--spacing-200);">Đối chiếu 5 đến 7 ảnh thực tế mỗi xe</h3>
+        <p class="body-3 muted" style="margin-top: var(--spacing-75);">
+          Bộ ảnh chụp thật độ phân giải từ 1.600px trở lên kèm nguồn gốc và giấy phép mở rõ ràng.
+        </p>
+      </article>
+
+      <article class="bento-card bento-card--wide">
+        <div class="icon-box" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+            <path d="m9 16 2 2 4-4"/>
+          </svg>
+        </div>
+        <h3 class="heading-5" style="margin-top: var(--spacing-200);">Đặt lịch lái thử riêng trong 60 giây</h3>
+        <p class="body-3 muted" style="margin-top: var(--spacing-75);">
+          Chọn ngày hẹn mong muốn ngay trên trang chi tiết xe, theo dõi trạng thái xác nhận trực tuyến và trải nghiệm xe thực tế tại đường Lê Lợi, Quận 1.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 6. XE NỔI BẬT: LƯỚI 3 CỘT (2 ở tablet, 1 ở mobile), THẺ TRẮNG -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div>
+        <h2 class="heading-3">Mẫu xe nổi bật sẵn sàng cấu hình 3D</h2>
+        <p class="body-3 muted" style="margin-top: var(--spacing-75);">
+          Toàn bộ xe đều có sẵn mô hình 3D glTF riêng biệt và bộ ảnh thực tế đa góc chụp.
+        </p>
+      </div>
+      <a href="{{ url_for('cars.list_cars') }}" class="btn btn--secondary button-sm">Xem toàn bộ {{ total_cars }} xe</a>
+    </div>
+
+    <div class="cards-grid" data-reveal>
+      {% for car in featured_cars %}
+        {{ render_car_card(car) }}
+      {% else %}
+        <div class="panel">
+          <p class="body-3 muted">Hiện chưa có mẫu xe nổi bật nào trong danh sách.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- 7. QUY TRÌNH 3 BƯỚC: 3 CỘT NGANG CÓ SỐ 01, 02, 03 LỚN VÀ ĐƯỜNG NỐI MẢNH -->
+<section class="section section--surface">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div style="max-width: 680px;">
+        <h2 class="heading-3">Quy trình từ cấu hình trực tuyến đến cầm lái thực tế</h2>
+        <p class="body-3 muted" style="margin-top: var(--spacing-75);">
+          Ba bước rõ ràng giúp bạn chủ động toàn bộ thông tin trước khi gặp chuyên viên kỹ thuật.
+        </p>
+      </div>
+    </div>
+
+    <div class="steps-grid steps-grid--connected" data-reveal>
+      <article class="step-card">
+        <div class="step-card__head">
+          <span class="heading-2 mono-num step-card__big">01</span>
+          <span class="step-card__connector" aria-hidden="true"></span>
+        </div>
+        <h3 class="heading-5" style="margin-top: var(--spacing-200);">Khám phá và thử màu sơn 3D</h3>
+        <p class="body-3 muted" style="margin-top: var(--spacing-75);">
+          Chọn mẫu xe trong bộ sưu tập, xoay mô hình 3D theo từng chương thiết kế và bấm chọn mã màu sơn để xem hiệu ứng phản chiếu.
+        </p>
+      </article>
+
+      <article class="step-card">
+        <div class="step-card__head">
+          <span class="heading-2 mono-num step-card__big">02</span>
+          <span class="step-card__connector" aria-hidden="true"></span>
+        </div>
+        <h3 class="heading-5" style="margin-top: var(--spacing-200);">Đặt lịch hẹn lái thử hoặc đặt mua</h3>
+        <p class="body-3 muted" style="margin-top: var(--spacing-75);">
+          Đăng nhập tài khoản, chọn ngày lái thử phù hợp hoặc gửi yêu cầu đặt mua với màu sơn đã chọn cùng ghi chú mong muốn.
+        </p>
+      </article>
+
+      <article class="step-card">
+        <div class="step-card__head">
+          <span class="heading-2 mono-num step-card__big">03</span>
+        </div>
+        <h3 class="heading-5" style="margin-top: var(--spacing-200);">Trải nghiệm và nhận xe tại Quận 1</h3>
+        <p class="body-3 muted" style="margin-top: var(--spacing-75);">
+          Chuyên viên kỹ thuật chuẩn bị sẵn mẫu xe đúng cấu hình tại showroom đường Lê Lợi để bạn trực tiếp cầm lái và nhận bàn giao.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 8. BẰNG CHỨNG XÃ HỘI: SỐ LIỆU DB + 2 NHẬN XÉT KHÁCH HÀNG -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div style="max-width: 680px;">
+        <h2 class="heading-3">Dữ liệu minh bạch và phản hồi từ người cầm lái</h2>
+        <p class="body-3 muted" style="margin-top: var(--spacing-75);">
+          Mỗi tệp mô hình 3D và hình ảnh trên hệ thống đều được kiểm định tự động và công khai nguồn gốc tại trang Bản quyền.
+        </p>
+      </div>
+    </div>
+
+    <div class="telemetry-stats" data-reveal>
+      <div class="telemetry-stat">
+        <div class="heading-2 mono-num">{{ total_cars }}</div>
+        <div class="title-4" style="margin-top: var(--spacing-75);">Mẫu xe thật ngoài đời</div>
+        <p class="body-6 muted" style="margin-top: var(--spacing-50);">Bao gồm Porsche, BMW, Audi, Mercedes, Lamborghini, Nissan, Ford, Mazda, Land Rover, Tesla, Volkswagen và Subaru.</p>
+      </div>
+      <div class="telemetry-stat">
+        <div class="heading-2 mono-num">489.304</div>
+        <div class="title-4" style="margin-top: var(--spacing-75);">Tam giác 3D tối đa trên một xe</div>
+        <p class="body-6 muted" style="margin-top: var(--spacing-50);">Mọi mô hình đều nằm trong ngưỡng từ 38.912 đến 489.304 tam giác để vừa sắc nét vừa giữ tốc độ khung hình mượt.</p>
+      </div>
+      <div class="telemetry-stat">
+        <div class="heading-2 mono-num">78</div>
+        <div class="title-4" style="margin-top: var(--spacing-75);">Ảnh chụp thật đã kiểm định độ nét</div>
+        <p class="body-6 muted" style="margin-top: var(--spacing-50);">Tất cả ảnh đều đạt độ phân giải ngang từ 1.600px trở lên, được lọc chống mờ và chống trùng lặp mã băm.</p>
+      </div>
+    </div>
+
+    <div class="testimonials-grid" style="margin-top: var(--spacing-400);" data-reveal>
+      <article class="panel panel--subtle">
+        <p class="body-2">
+          “Trình xem 3D cho phép tôi quan sát rất rõ tỷ lệ thân xe và độ phản chiếu của màu sơn Đỏ Guards Red trên Porsche 911 Carrera trước khi đặt lịch qua Quận 1 xem xe thực tế.”
+        </p>
+        <div class="divider-line" style="margin-block: var(--spacing-200);"></div>
+        <div class="title-4">Trần Minh Khôi</div>
+        <div class="caption-2 muted">Khách hàng đặt mua tại Quận 1 · Thành phố Hồ Chí Minh</div>
+      </article>
+
+      <article class="panel panel--subtle">
+        <p class="body-2">
+          “Bộ ảnh thực tế kèm thông số rõ ràng và tính năng đặt lịch lái thử trực tuyến giúp tôi tiết kiệm hàng giờ tìm kiếm thông tin rời rạc từ nhiều nguồn khác nhau.”
+        </p>
+        <div class="divider-line" style="margin-block: var(--spacing-200);"></div>
+        <div class="title-4">Nguyễn Thảo Linh</div>
+        <div class="caption-2 muted">Khách hàng đặt lịch lái thử · Thành phố Hồ Chí Minh</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 9. FAQ: ACCORDION 1 CỘT (6 CÂU) -->
+<section class="section section--surface">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div style="max-width: 680px;">
+        <h2 class="heading-3">Câu hỏi thường gặp</h2>
+        <p class="body-3 muted" style="margin-top: var(--spacing-75);">
+          Giải đáp chi tiết về mô hình 3D, quy trình đặt lịch lái thử và chính sách đặt mua tại Solvang.
+        </p>
+      </div>
+    </div>
+
+    <div class="faq-accordion" data-reveal>
+      <details class="faq-item" open>
+        <summary class="title-2 faq-item__summary">Mô hình 3D trên website có đúng với xe thật ngoài đời không?</summary>
+        <p class="body-3 muted faq-item__body">
+          Có. Toàn bộ 12 mẫu xe đều sử dụng tệp glTF của đúng dòng xe thật ngoài đời, có tách riêng lớp vật liệu sơn thân vỏ, kính, mâm và lốp, đồng thời đã qua kiểm định tỷ lệ kích thước bao ngoài.
+        </p>
+      </details>
+
+      <details class="faq-item">
+        <summary class="title-2 faq-item__summary">Đặt lịch lái thử trực tuyến có mất phí hay phải đặt cọc không?</summary>
+        <p class="body-3 muted faq-item__body">
+          Không. Việc đăng ký tài khoản và đặt lịch hẹn lái thử trên hệ thống hoàn toàn miễn phí và không yêu cầu nhập thẻ thanh toán hay chuyển khoản đặt cọc.
+        </p>
+      </details>
+
+      <details class="faq-item">
+        <summary class="title-2 faq-item__summary">Tôi có thể đổi màu sơn hoặc hủy đơn đặt xe sau khi đã gửi yêu cầu không?</summary>
+        <p class="body-3 muted faq-item__body">
+          Khi đơn đặt xe đang ở trạng thái chờ xác nhận, bạn có thể liên hệ chuyên viên tư vấn hoặc ghi chú thay đổi màu sơn, cũng như hủy yêu cầu mà không phát sinh bất kỳ chi phí nào.
+        </p>
+      </details>
+
+      <details class="faq-item">
+        <summary class="title-2 faq-item__summary">Nếu thiết bị của tôi có cấu hình yếu thì trình xem 3D có bị giật không?</summary>
+        <p class="body-3 muted faq-item__body">
+          Trình xem 3D tự động nhận diện thiết bị di động hoặc máy có bộ nhớ thấp để điều chỉnh mật độ điểm ảnh và bóng đổ, đồng thời giải phóng tài nguyên đồ họa ngay khi bạn chuyển trang.
+        </p>
+      </details>
+
+      <details class="faq-item">
+        <summary class="title-2 faq-item__summary">Nguồn gốc hình ảnh và mô hình 3D trên trang được kiểm chứng ở đâu?</summary>
+        <p class="body-3 muted faq-item__body">
+          Bạn có thể truy cập trang Bản quyền ở cuối trang để xem danh sách toàn bộ 12 mô hình 3D và 78 ảnh chụp thực tế được trích xuất trực tiếp từ cơ sở dữ liệu kèm tên tác giả và liên kết giấy phép gốc.
+        </p>
+      </details>
+
+      <details class="faq-item">
+        <summary class="title-2 faq-item__summary">Tôi cần chuẩn bị giấy tờ gì khi đến showroom Quận 1 lái thử?</summary>
+        <p class="body-3 muted faq-item__body">
+          Bạn chỉ cần mang theo căn cước công dân và giấy phép lái xe ô tô còn hiệu lực. Chuyên viên kỹ thuật sẽ đồng hành và hướng dẫn toàn bộ tính năng vận hành trên cung đường thử nghiệm.
+        </p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- 10. CTA CUỐI: KHỐI NỀN #0A0A0A BO GÓC 24px, CHỮ TRẮNG, NÚT CAM -->
+<section class="section">
+  <div class="wrap">
+    <div class="final-cta-box" data-reveal>
+      <div style="max-width: 680px;">
+        <h2 class="heading-2" style="color: #FFFFFF;">Sẵn sàng cấu hình mẫu xe của bạn</h2>
+        <p class="body-2" style="color: #D4D4D0; margin-top: var(--spacing-200);">
+          Đặt lịch lái thử hoàn toàn miễn phí · Hủy hoặc dời lịch hẹn bất cứ lúc nào trước 24 giờ · Không yêu cầu đặt cọc trực tuyến.
+        </p>
+        <div style="margin-top: var(--spacing-300);">
+          <a href="{{ url_for('cars.list_cars') }}" class="btn btn--primary button-md">Khám phá 12 mẫu xe</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

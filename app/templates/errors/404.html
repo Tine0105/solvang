@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}404 — Không tìm thấy trang{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap" style="max-width: 600px;">
+    <span class="badge badge--accent">Lỗi 404</span>
+    <h1 style="margin-top: 16px;">Không tìm thấy trang</h1>
+    <p class="lead" style="margin-top: 12px;">Đường dẫn bạn truy cập không tồn tại hoặc đã được di chuyển.</p>
+    <div class="btn-row" style="margin-top: 24px;">
+      <a href="{{ url_for('main.index') }}" class="btn btn--primary">Về trang chủ</a>
+      <a href="{{ url_for('cars.list_cars') }}" class="btn btn--secondary">Xem bộ sưu tập xe</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

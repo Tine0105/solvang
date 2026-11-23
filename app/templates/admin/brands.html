@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Quản lý hãng xe — Admin Solvang{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: calc(var(--spacing-900) + var(--spacing-300));">
+  <div class="wrap">
+    <div class="section-head">
+      <h1>Quản lý hãng xe</h1>
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn--secondary btn--sm">Dashboard</a>
+    </div>
+
+    <div class="detail-grid" style="grid-template-columns: 1fr 1.4fr;">
+      <div class="panel">
+        <h2 style="font-size: 22px; margin-bottom: 16px;">Thêm hãng xe</h2>
+        <form method="post" enctype="multipart/form-data" class="form-grid">
+          {{ form.hidden_tag() }}
+          <div class="field">
+            <label for="brand-name">{{ form.name.label.text }}</label>
+            {{ form.name(id='brand-name', class='input') }}
+          </div>
+          <div class="field">
+            <label for="brand-logo">{{ form.logo_file.label.text }}</label>
+            {{ form.logo_file(id='brand-logo', class='input') }}
+          </div>
+          <button type="submit" class="btn btn--primary">{{ form.submit.label.text }}</button>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Tên hãng</th><th>Số mẫu xe</th><th>Thao tác</th></tr>
+          </thead>
+          <tbody>
+            {% for b in brands %}
+            <tr>
+              <td><strong>{{ b.name }}</strong></td>
+              <td>{{ b.cars|length }}</td>
+              <td>
+                <form action="{{ url_for('admin.delete_brand', brand_id=b.id) }}" method="post" onsubmit="return confirm('Xóa hãng xe sẽ xóa các xe thuộc hãng này. Tiếp tục?');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn--secondary btn--sm">Xóa</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}403 — Không có quyền truy cập{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap" style="max-width: 600px;">
+    <span class="badge badge--danger">Lỗi 403</span>
+    <h1 style="margin-top: 16px;">Không có quyền truy cập</h1>
+    <p class="lead" style="margin-top: 12px;">Trang này chỉ dành cho tài khoản quản trị viên.</p>
+    <div class="btn-row" style="margin-top: 24px;">
+      <a href="{{ url_for('main.index') }}" class="btn btn--primary">Về trang chủ</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

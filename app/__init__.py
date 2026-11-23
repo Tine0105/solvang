@@ -59,3 +59,10 @@ def create_app(config_class=Config):
         return render_template('errors/500.html'), 500
 
     return app
+
+
+def __getattr__(name):
+    # Support default Render/Gunicorn entrypoint `gunicorn app:app` without eager init on normal imports
+    if name == 'app':
+        return create_app()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -9,6 +9,8 @@ load_dotenv(os.path.join(basedir, '.env'))
 def _build_mysql_uri() -> str:
     explicit_url = os.environ.get('DATABASE_URL')
     if explicit_url:
+        if explicit_url.startswith('mysql://'):
+            return 'mysql+pymysql://' + explicit_url[len('mysql://'):]
         return explicit_url
     host = os.environ.get('DB_HOST', '127.0.0.1')
     port = os.environ.get('DB_PORT', '3306')

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý Thương hiệu Xe Sang | LuxAuto Admin{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="mb-4">
+    <a href="{{ url_for('admin.dashboard') }}" class="small text-gold">← Quay lại Dashboard</a>
+    <h2 class="fw-bold mb-0 mt-1">Quản Lý Thương Hiệu Xe Sang</h2>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card lux-card p-4">
+        <h5 class="fw-bold mb-3">Thêm thương hiệu mới</h5>
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), placeholder="Bentley") }}
+            {% for err in form.name.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.country.label(class="form-label") }}
+            {{ form.country(class="form-control" + (" is-invalid" if form.country.errors else ""), placeholder="Vương quốc Anh") }}
+          </div>
+          <div class="mb-3">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control", placeholder="Mô tả thương hiệu...") }}
+          </div>
+          {{ form.submit(class="btn btn-gold w-100") }}
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="card lux-card p-4">
+        <h5 class="fw-bold mb-3">Danh sách thương hiệu ({{ brands | length }})</h5>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Thương hiệu</th>
+                <th>Quốc gia</th>
+                <th>Số xe</th>
+                <th class="text-end">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in brands %}
+                <tr>
+                  <td>#{{ b.id }}</td>
+                  <td class="fw-bold">{{ b.name }}</td>
+                  <td>{{ b.country }}</td>
+                  <td>{{ b.cars | length }}</td>
+                  <td class="text-end">
+                    <form method="post" action="{{ url_for('admin.delete_brand', brand_id=b.id) }}" class="d-inline" onsubmit="return confirm('Xóa hãng xe này sẽ xóa các xe trực thuộc. Tiếp tục?');">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

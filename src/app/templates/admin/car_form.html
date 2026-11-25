@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Cập nhật xe sang' if car else 'Thêm mẫu xe mới' }} | LuxAuto Admin{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="mb-4">
+    <a href="{{ url_for('admin.cars') }}" class="small text-gold">← Quay lại Danh sách xe</a>
+    <h2 class="fw-bold mb-0 mt-1">{{ 'Chỉnh sửa thông tin: ' ~ car.name if car else 'Thêm Mẫu Xe Sang Mới' }}</h2>
+  </div>
+
+  <div class="card lux-card p-4 shadow">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          {{ form.brand_id.label(class="form-label") }}
+          {{ form.brand_id(class="form-select") }}
+        </div>
+        <div class="col-md-4">
+          {{ form.name.label(class="form-label") }}
+          {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), placeholder="Porsche 911 GT3 RS") }}
+          {% for err in form.name.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+        </div>
+        <div class="col-md-4">
+          {{ form.slug.label(class="form-label") }}
+          {{ form.slug(class="form-control" + (" is-invalid" if form.slug.errors else ""), placeholder="porsche-911-gt3-rs") }}
+          {% for err in form.slug.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-3">
+          {{ form.year.label(class="form-label") }}
+          {{ form.year(class="form-control" + (" is-invalid" if form.year.errors else "")) }}
+          {% for err in form.year.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+        </div>
+        <div class="col-md-3">
+          {{ form.price.label(class="form-label") }}
+          {{ form.price(class="form-control" + (" is-invalid" if form.price.errors else ""), placeholder="8950000000") }}
+          {% for err in form.price.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+        </div>
+        <div class="col-md-3">
+          {{ form.horsepower.label(class="form-label") }}
+          {{ form.horsepower(class="form-control" + (" is-invalid" if form.horsepower.errors else "")) }}
+          {% for err in form.horsepower.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+        </div>
+        <div class="col-md-3">
+          {{ form.mileage.label(class="form-label") }}
+          {{ form.mileage(class="form-control") }}
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-3">
+          {{ form.body_type.label(class="form-label") }}
+          {{ form.body_type(class="form-select") }}
+        </div>
+        <div class="col-md-3">
+          {{ form.fuel_type.label(class="form-label") }}
+          {{ form.fuel_type(class="form-select") }}
+        </div>
+        <div class="col-md-3">
+          {{ form.transmission.label(class="form-label") }}
+          {{ form.transmission(class="form-select") }}
+        </div>
+        <div class="col-md-3">
+          {{ form.exterior_color.label(class="form-label") }}
+          {{ form.exterior_color(class="form-control") }}
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3 align-items-end">
+        <div class="col-md-2">
+          {{ form.seats.label(class="form-label") }}
+          {{ form.seats(class="form-control") }}
+        </div>
+        <div class="col-md-2">
+          {{ form.stock.label(class="form-label") }}
+          {{ form.stock(class="form-control") }}
+        </div>
+        <div class="col-md-3">
+          {{ form.thumbnail_file.label(class="form-label") }}
+          {{ form.thumbnail_file(class="form-control") }}
+          {% for err in form.thumbnail_file.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+        </div>
+        <div class="col-md-3">
+          {{ form.gallery_files.label(class="form-label") }}
+          {{ form.gallery_files(class="form-control") }}
+        </div>
+        <div class="col-md-2">
+          {{ form.model_file.label(class="form-label") }}
+          {{ form.model_file(class="form-control") }}
+          {% for err in form.model_file.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+        </div>
+      </div>
+
+      <div class="form-check mb-3">
+        {{ form.is_featured(class="form-check-input") }}
+        {{ form.is_featured.label(class="form-check-label text-gold fw-semibold") }}
+      </div>
+
+      <div class="mb-4">
+        {{ form.description.label(class="form-label") }}
+        {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="4") }}
+        {% for err in form.description.errors %}<div class="invalid-feedback">{{ err }}</div>{% endfor %}
+      </div>
+
+      <div class="d-flex gap-2">
+        {{ form.submit(class="btn btn-gold px-4") }}
+        <a href="{{ url_for('admin.cars') }}" class="btn btn-outline-light">Hủy bỏ</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

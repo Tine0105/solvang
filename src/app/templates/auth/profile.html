@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Hồ sơ cá nhân | LuxAuto Showroom{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+      <div class="card lux-card shadow p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h3 class="fw-bold mb-1">Hồ sơ thành viên</h3>
+            <div class="small text-muted">Email: {{ current_user.email }}</div>
+          </div>
+          <span class="badge {{ 'bg-warning text-dark' if current_user.is_admin else 'bg-info' }}">
+            {{ 'Quản trị viên (Admin)' if current_user.is_admin else 'Khách hàng (User)' }}
+          </span>
+        </div>
+
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.full_name.label(class="form-label") }}
+            {{ form.full_name(class="form-control" + (" is-invalid" if form.full_name.errors else "")) }}
+            {% for err in form.full_name.errors %}
+              <div class="invalid-feedback">{{ err }}</div>
+            {% endfor %}
+          </div>
+          <div class="mb-4">
+            {{ form.phone.label(class="form-label") }}
+            {{ form.phone(class="form-control" + (" is-invalid" if form.phone.errors else "")) }}
+            {% for err in form.phone.errors %}
+              <div class="invalid-feedback">{{ err }}</div>
+            {% endfor %}
+          </div>
+          {{ form.submit(class="btn btn-gold") }}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

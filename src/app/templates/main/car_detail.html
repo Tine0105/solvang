@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% block title %}{{ car.name }} — Trải nghiệm 3D & Đặt cọc | LuxAuto{% endblock %}
+
+{% block head_extra %}
+  {% if car.model_3d_url %}
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Trang chủ</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('main.car_list') }}">Bộ sưu tập xe</a></li>
+      <li class="breadcrumb-item text-gold">{{ car.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Trình xem Mô hình 3D Tương tác (Three.js / glTF) + Bộ sưu tập Ảnh -->
+    <div class="col-lg-7">
+      {% if car.model_3d_url %}
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge bg-warning text-dark">✦ TRÌNH XEM 3D TƯƠNG TÁC 360° (WebGL / glTF)</span>
+          <div class="d-flex gap-2">
+            <button type="button" id="btnShow3D" class="btn btn-sm btn-gold" onclick="switchMediaMode('3d')">Mô hình 3D</button>
+            <button type="button" id="btnShowPhoto" class="btn btn-sm btn-outline-gold" onclick="switchMediaMode('photo')">Ảnh thực tế</button>
+          </div>
+        </div>
+
+        <div id="stage3DWrapper" class="mb-3">
+          <div
+            class="viewer-stage"
+            data-car-viewer
+            data-model-url="{{ car.model_3d_url }}"
+            data-hdri-url="{{ url_for('static', filename='hdri/studio_small_09_2k.hdr') }}"
+            data-body-materials='{{ (car.body_material_names or []) | tojson }}'
+            data-model-scale="1.0"
+            data-model-offset-y="0.0"
+            data-exposure="1.18"
+            data-initial-color="#d4af37"
+            data-autorotate="true"
+          >
+            <div class="viewer-stage__loading" data-viewer-loading>Đang dựng mô hình 3D glTF trong Studio…</div>
+            <div class="viewer-stage__canvas" data-viewer-canvas aria-label="Trình xem 3D {{ car.name }}"></div>
+            <img class="viewer-stage__fallback" data-viewer-fallback src="{{ car.thumbnail_url }}" alt="{{ car.name }}" hidden>
+            <span class="viewer-stage__badge badge bg-dark" data-viewer-updating hidden>Chế độ ảnh 2D</span>
+
+            <div class="viewer-stage__bar">
+              <div class="d-flex align-items-center gap-2 flex-wrap" role="group" aria-label="Đổi màu sơn 3D trực tiếp">
+                <button type="button" class="swatch-btn" style="background-color: #d4af37;" data-color-swatch data-color-hex="#d4af37" data-color-name="Vàng Champagne" aria-pressed="true" title="Vàng Champagne"></button>
+                <button type="button" class="swatch-btn" style="background-color: #c81e1e;" data-color-swatch data-color-hex="#c81e1e" data-color-name="Đỏ Rosso Corsa" aria-pressed="false" title="Đỏ Rosso Corsa"></button>
+                <button type="button" class="swatch-btn" style="background-color: #161922;" data-color-swatch data-color-hex="#161922" data-color-name="Đen Obsidian" aria-pressed="false" title="Đen Obsidian"></button>
+                <button type="button" class="swatch-btn" style="background-color: #cbd5e1;" data-color-swatch data-color-hex="#cbd5e1" data-color-name="Bạc GT Silver" aria-pressed="false" title="Bạc GT Silver"></button>
+                <button type="button" class="swatch-btn" style="background-color: #1d4ed8;" data-color-swatch data-color-hex="#1d4ed8" data-color-name="Xanh Sapphire" aria-pressed="false" title="Xanh Sapphire"></button>
+                <span class="small text-light ms-1" data-viewer-color-name>Vàng Champagne</span>
+              </div>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-gold" data-viewer-autorotate aria-pressed="true">Tạm dừng xoay</button>
+                <button type="button" class="btn btn-sm btn-outline-gold" data-viewer-fullscreen>Toàn màn hình</button>
+              </div>
+            </div>
+          </div>
+          <div class="small text-muted mt-1">💡 Kéo chuột để xoay 360°, cuộn con lăn để thu phóng, nhấn bảng màu để đổi màu sơn ngoại thất trực tiếp trên mô hình 3D.</div>
+        </div>
+      {% endif %}
+
+      <div id="stagePhotoWrapper" class="card lux-card overflow-hidden mb-3" {% if car.model_3d_url %}style="display: none;"{% endif %}>
+        <img id="mainCarPreview" src="{{ car.thumbnail_url }}" alt="{{ car.name }}" style="width: 100%; height: 420px; object-fit: cover;">
+      </div>
+
+      {% if car.images %}
+        <div class="row g-2 mb-4">
+          {% for img in car.images %}
+            <div class="col-3">
+              <img src="{{ img.image_url }}" alt="{{ img.caption or car.name }}"
+                   onclick="switchMediaMode('photo'); document.getElementById('mainCarPreview').src=this.src;"
+                   class="rounded w-100" style="height: 82px; object-fit: cover; cursor: pointer; border: 1px solid rgba(212,175,55,0.35);">
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="card lux-card p-4 mb-4">
+        <h4 class="fw-bold mb-3">Thông số kỹ thuật tiêu chuẩn</h4>
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-4"><div class="spec-box"><div class="small text-muted">Năm sản xuất</div><div class="fw-bold">{{ car.year }}</div></div></div>
+          <div class="col-6 col-md-4"><div class="spec-box"><div class="small text-muted">Công suất cực đại</div><div class="fw-bold text-gold">{{ car.horsepower }} HP</div></div></div>
+          <div class="col-6 col-md-4"><div class="spec-box"><div class="small text-muted">Kiểu dáng</div><div class="fw-bold">{{ car.body_type }} ({{ car.seats }} chỗ)</div></div></div>
+          <div class="col-6 col-md-4"><div class="spec-box"><div class="small text-muted">Hệ truyền động</div><div class="fw-bold">{{ car.fuel_type }}</div></div></div>
+          <div class="col-6 col-md-4"><div class="spec-box"><div class="small text-muted">Hộp số</div><div class="fw-bold">{{ car.transmission }}</div></div></div>
+          <div class="col-6 col-md-4"><div class="spec-box"><div class="small text-muted">Màu ngoại thất</div><div class="fw-bold">{{ car.exterior_color }}</div></div></div>
+        </div>
+        <h5 class="fw-bold mb-2">Giới thiệu & Trang bị nổi bật</h5>
+        <p class="text-muted mb-0" style="white-space: pre-line;">{{ car.description }}</p>
+      </div>
+    </div>
+
+    <!-- Cột Giá bán, Quy đổi ngoại tệ & Đặt cọc / Lái thử -->
+    <div class="col-lg-5">
+      <div class="card lux-card p-4 mb-4 shadow">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge bg-warning text-dark">{{ car.brand.name }}</span>
+          <span class="badge {{ 'bg-success' if car.stock > 0 else 'bg-danger' }}">
+            {{ 'Sẵn giao: ' ~ car.stock ~ ' xe' if car.stock > 0 else 'Tạm hết hàng' }}
+          </span>
+        </div>
+        <h2 class="fw-bold mb-2">{{ car.name }}</h2>
+
+        <div class="p-3 rounded-3 spec-box mb-3">
+          <div class="small text-muted">Giá niêm yết chính hãng</div>
+          <div class="fs-3 fw-bold text-gold">{{ car.price | vnd }}</div>
+          <div class="small text-muted mt-1">
+            Quy đổi trực tuyến: <strong class="text-light">≈ {{ converted.usd | usd }} USD</strong>
+            · <strong class="text-light">€{{ "{:,.0f}".format(converted.eur) }} EUR</strong>
+          </div>
+          <div class="small text-muted mt-1">Mức đặt cọc tiêu chuẩn (5%): <strong class="text-gold">{{ deposit_vnd | vnd }}</strong></div>
+        </div>
+
+        {% if current_user.is_authenticated %}
+          <form method="post" action="{{ url_for('main.toggle_favorite', car_id=car.id) }}" class="mb-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-sm {{ 'btn-gold' if is_favorite else 'btn-outline-gold' }} w-100">
+              {{ '♥ Đã lưu trong Yêu thích (Nhấn để bỏ)' if is_favorite else '♡ Lưu vào bộ sưu tập Yêu thích' }}
+            </button>
+          </form>
+
+          {% if current_user.is_admin %}
+            <a href="{{ url_for('admin.edit_car', car_id=car.id) }}" class="btn btn-sm btn-outline-light w-100 mb-3">
+              ✎ Chỉnh sửa mẫu xe & Upload 3D (.glb)
+            </a>
+          {% endif %}
+
+          <hr style="border-color: rgba(255,255,255,0.1);">
+          <h5 class="fw-bold mb-3">1. Đặt cọc giữ xe trực tuyến</h5>
+          <form method="post" action="{{ url_for('main.create_order', car_id=car.id) }}">
+            {{ order_form.hidden_tag() }}
+            <div class="mb-2">
+              {{ order_form.customer_phone.label(class="form-label small") }}
+              {{ order_form.customer_phone(class="form-control", placeholder="0909123456") }}
+            </div>
+            <div class="mb-2">
+              {{ order_form.payment_method.label(class="form-label small") }}
+              {{ order_form.payment_method(class="form-select") }}
+            </div>
+            <div class="mb-3">
+              {{ order_form.note.label(class="form-label small") }}
+              {{ order_form.note(class="form-control", rows="2", placeholder="Màu nội thất mong muốn, thời gian nhận xe...") }}
+            </div>
+            {{ order_form.submit(class="btn btn-gold w-100") }}
+          </form>
+
+          <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+          <h5 class="fw-bold mb-3">2. Đăng ký lịch hẹn lái thử</h5>
+          <form method="post" action="{{ url_for('main.create_test_drive', car_id=car.id) }}">
+            {{ test_drive_form.hidden_tag() }}
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                {{ test_drive_form.preferred_date.label(class="form-label small") }}
+                {{ test_drive_form.preferred_date(class="form-control", type="date") }}
+              </div>
+              <div class="col-6">
+                {{ test_drive_form.time_slot.label(class="form-label small") }}
+                {{ test_drive_form.time_slot(class="form-select") }}
+              </div>
+            </div>
+            <div class="mb-3">
+              {{ test_drive_form.phone.label(class="form-label small") }}
+              {{ test_drive_form.phone(class="form-control", placeholder="0909123456") }}
+            </div>
+            {{ test_drive_form.submit(class="btn btn-outline-gold w-100") }}
+          </form>
+        {% else %}
+          <div class="p-3 rounded spec-box text-center">
+            <p class="small text-muted mb-3">Vui lòng đăng nhập tài khoản thành viên để đặt cọc xe trực tuyến hoặc đăng ký lái thử.</p>
+            <a href="{{ url_for('auth.login', next=request.path) }}" class="btn btn-gold w-100">Đăng nhập để đặt xe</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if related_cars %}
+    <div class="mt-4">
+      <h4 class="fw-bold mb-3">Mẫu xe tương đương gợi ý</h4>
+      <div class="row g-4">
+        {% for item in related_cars %}
+          <div class="col-md-4">
+            {% with car=item %}
+              {% include 'partials/_car_card.html' %}
+            {% endwith %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function switchMediaMode(mode) {
+    const w3d = document.getElementById("stage3DWrapper");
+    const wPhoto = document.getElementById("stagePhotoWrapper");
+    const b3d = document.getElementById("btnShow3D");
+    const bPhoto = document.getElementById("btnShowPhoto");
+    if (!w3d || !wPhoto) return;
+    if (mode === "3d") {
+      w3d.style.display = "block";
+      wPhoto.style.display = "none";
+      if (b3d) b3d.className = "btn btn-sm btn-gold";
+      if (bPhoto) bPhoto.className = "btn btn-sm btn-outline-gold";
+      window.dispatchEvent(new Event("resize"));
+    } else {
+      w3d.style.display = "none";
+      wPhoto.style.display = "block";
+      if (b3d) b3d.className = "btn btn-sm btn-outline-gold";
+      if (bPhoto) bPhoto.className = "btn btn-sm btn-gold";
+    }
+  }
+</script>
+{% if car.model_3d_url %}
+  <script type="module" src="{{ url_for('static', filename='js/viewer3d.js') }}"></script>
+{% endif %}
+{% endblock %}

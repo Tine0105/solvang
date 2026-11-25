@@ -1,0 +1,33 @@
+<div class="card car-card h-100 shadow-sm">
+  <div class="position-relative">
+    <a href="{{ url_for('main.car_detail', slug=car.slug) }}">
+      <img src="{{ car.thumbnail_url }}" alt="{{ car.name }}" class="car-card-img">
+    </a>
+    <span class="badge bg-dark position-absolute top-0 end-0 m-2">{{ car.year }} · {{ car.body_type }}</span>
+    {% if car.model_3d_url %}
+      <span class="badge bg-warning text-dark position-absolute top-0 m-2" style="left: 0;">3D 360°</span>
+    {% endif %}
+  </div>
+  <div class="card-body">
+    <div class="small text-gold fw-semibold text-uppercase mb-1">{{ car.brand.name }}</div>
+    <h5 class="fw-bold mb-2">
+      <a href="{{ url_for('main.car_detail', slug=car.slug) }}" class="text-light">{{ car.name }}</a>
+    </h5>
+    <div class="d-flex flex-wrap gap-2 small text-muted mb-3">
+      <span>⚡ {{ car.horsepower }} HP</span>
+      <span>•</span>
+      <span>⛽ {{ car.fuel_type }}</span>
+      <span>•</span>
+      <span>🎨 {{ car.exterior_color }}</span>
+    </div>
+    <div class="mt-auto pt-2" style="border-top: 1px solid rgba(255,255,255,0.08);">
+      <div class="fs-5 fw-bold text-gold">{{ car.price | vnd }}</div>
+      {% if rates %}
+        <div class="small text-muted">≈ {{ (car.price / rates.usd_to_vnd) | usd }} USD</div>
+      {% endif %}
+      <a href="{{ url_for('main.car_detail', slug=car.slug) }}" class="btn btn-sm btn-outline-gold w-100 mt-3">
+        Xem chi tiết & Đặt cọc
+      </a>
+    </div>
+  </div>
+</div>

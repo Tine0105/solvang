@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Bộ sưu tập Yêu thích | LuxAuto{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-1">Bộ Sưu Tập Xe Yêu Thích</h2>
+  <p class="text-muted mb-4">Các mẫu siêu xe và xe sang bạn đã đánh dấu quan tâm ({{ cars | length }} xe).</p>
+
+  {% if cars %}
+    <div class="row g-4">
+      {% for car in cars %}
+        <div class="col-md-6 col-lg-4">
+          {% include 'partials/_car_card.html' %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card lux-card p-5 text-center">
+      <p class="text-muted mb-3">Bạn chưa lưu mẫu xe nào vào danh sách yêu thích.</p>
+      <div><a href="{{ url_for('main.car_list') }}" class="btn btn-gold">Khám phá Bộ sưu tập</a></div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

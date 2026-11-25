@@ -4,7 +4,9 @@ venv/
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
 instance/
+src/instance/*.db-journal
 
 # Environment & Secrets
 .env
@@ -15,6 +17,7 @@ instance/
 .agents/
 .taste-skill/
 ai-design-skills/
+skills/
 skills-lock.json
 .gemini/
 .claude/
@@ -27,14 +30,5 @@ Thumbs.db
 .idea/
 *.log
 
-# Heavy / Generated Media Assets
-app/static/img/cars/*
-!app/static/img/cars/*.svg
-app/static/img/uploads/*
-!app/static/img/uploads/.gitkeep
-app/static/video/*
-!app/static/video/.gitkeep
-app/static/models/*
-!app/static/models/.gitkeep
-app/static/hdri/*
-!app/static/hdri/.gitkeep
+# Uploaded Media
+src/app/static/uploads/cars/*.webp

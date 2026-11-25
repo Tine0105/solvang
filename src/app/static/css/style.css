@@ -1,0 +1,254 @@
+/* Giao diện LuxAuto Showroom — Tông màu Dark Charcoal & Champagne Gold trên nền Bootstrap 5 */
+:root {
+  --lux-bg: #0c0e14;
+  --lux-surface: #151923;
+  --lux-surface-2: #1d2230;
+  --lux-gold: #d4af37;
+  --lux-gold-hover: #e5c349;
+  --lux-text: #f3f4f6;
+  --lux-muted: #9ca3af;
+  --lux-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  background-color: var(--lux-bg);
+  color: var(--lux-text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+.text-muted { color: var(--lux-muted) !important; }
+.text-gold { color: var(--lux-gold) !important; }
+
+/* Navbar */
+.lux-navbar {
+  background: rgba(12, 14, 20, 0.94);
+  border-bottom: 1px solid var(--lux-border);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+
+.lux-brand-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #d4af37, #9a7617);
+  color: #0c0e14;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lux-navbar .navbar-brand {
+  font-size: 1.2rem;
+  letter-spacing: 0.03em;
+}
+
+.lux-navbar .nav-link {
+  color: #d1d5db;
+  font-size: 0.93rem;
+  padding: 0.42rem 0.82rem !important;
+  border-radius: 0.45rem;
+  white-space: nowrap;
+}
+
+.lux-navbar .nav-link:hover,
+.lux-navbar .nav-link.active {
+  color: var(--lux-gold);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+/* Buttons */
+.btn-gold, .btn-primary {
+  background: linear-gradient(135deg, #d4af37, #b89021);
+  border-color: #d4af37;
+  color: #0c0e14 !important;
+  font-weight: 700;
+}
+
+.btn-gold:hover, .btn-primary:hover {
+  background: linear-gradient(135deg, #e5c349, #c9a02c);
+  border-color: #e5c349;
+  color: #0c0e14 !important;
+  transform: translateY(-1px);
+}
+
+.btn-outline-gold, .btn-outline-light {
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  color: var(--lux-gold);
+  background: transparent;
+}
+
+.btn-outline-gold:hover, .btn-outline-light:hover {
+  background: rgba(212, 175, 55, 0.14);
+  border-color: var(--lux-gold);
+  color: #fff;
+}
+
+.btn-outline-danger {
+  border: 1px solid rgba(239, 68, 68, 0.55);
+  color: #fca5a5;
+  background: transparent;
+}
+.btn-outline-danger:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* Cards */
+.lux-card, .card {
+  background-color: var(--lux-surface);
+  border: 1px solid var(--lux-border);
+  color: var(--lux-text);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.car-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(212, 175, 55, 0.5);
+}
+
+.car-card-img {
+  height: 215px;
+  width: 100%;
+  object-fit: cover;
+  background: #0a0c10;
+}
+
+/* Hero Banner */
+.lux-hero {
+  background: radial-gradient(circle at 80% 25%, rgba(212, 175, 55, 0.16), transparent 50%),
+              linear-gradient(180deg, #131722 0%, #0c0e14 100%);
+  border-bottom: 1px solid var(--lux-border);
+}
+
+.hero-showcase-img {
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+  border-radius: 1rem;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+}
+
+/* Rate Ticker */
+.rate-pill {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  color: #f3e8c2;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.84rem;
+}
+
+/* Spec Grid */
+.spec-box {
+  background: var(--lux-surface-2);
+  border: 1px solid var(--lux-border);
+  border-radius: 0.65rem;
+  padding: 0.75rem 0.95rem;
+}
+
+/* Stat Cards in Admin */
+.stat-card {
+  background: linear-gradient(145deg, #171c28, #121620);
+  border: 1px solid var(--lux-border);
+  border-left: 4px solid var(--lux-gold);
+  border-radius: 0.75rem;
+  padding: 1.15rem 1.25rem;
+}
+
+/* QR Demo Box */
+.qr-demo-box {
+  background: #fff;
+  color: #111827;
+  padding: 1.25rem;
+  border-radius: 0.85rem;
+  max-width: 260px;
+  margin: 0 auto;
+}
+
+/* Interactive 3D Studio Stage (Three.js / glTF) */
+.viewer-stage {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 35%, #1f2636 0%, #090b10 80%);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+.viewer-stage__canvas {
+  width: 100%;
+  height: 430px;
+  cursor: grab;
+}
+
+.viewer-stage__canvas:active {
+  cursor: grabbing;
+}
+
+.viewer-stage__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lux-gold);
+  font-weight: 600;
+  background: rgba(12, 14, 20, 0.72);
+  z-index: 5;
+}
+
+.viewer-stage__loading[hidden] {
+  display: none !important;
+}
+
+.viewer-stage__fallback {
+  width: 100%;
+  height: 430px;
+  object-fit: cover;
+}
+
+.viewer-stage__bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(12, 14, 20, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.swatch-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.swatch-btn[aria-pressed="true"],
+.swatch-btn:hover {
+  transform: scale(1.18);
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px var(--lux-gold);
+}
+
+/* Footer */
+.lux-footer {
+  background: #090b10;
+  border-top: 1px solid var(--lux-border);
+  color: var(--lux-muted);
+  font-size: 0.9rem;
+}

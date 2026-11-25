@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Bộ sưu tập Xe Sang — Tìm kiếm & Phân trang | LuxAuto{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+      <div class="small text-gold text-uppercase fw-semibold">Danh mục trực tuyến</div>
+      <h2 class="fw-bold mb-0">Bộ Sưu Tập Siêu Xe & Xe Hạng Sang</h2>
+    </div>
+    <div class="rate-pill">
+      Tỷ giá API ({{ rates.provider }}): <strong>1 USD = {{ "{:,.0f}".format(rates.usd_to_vnd).replace(",", ".") }} ₫</strong>
+    </div>
+  </div>
+
+  <!-- Thanh tìm kiếm & bộ lọc đa tiêu chí (CarSearchForm - Flask-WTF) -->
+  <form method="get" action="{{ url_for('main.car_list') }}" class="card lux-card p-3 mb-4 shadow-sm">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4 col-lg-3">
+        {{ search_form.q.label(class="form-label small text-muted") }}
+        {{ search_form.q(class="form-control", placeholder="Nhập tên xe, hãng, màu...") }}
+      </div>
+      <div class="col-md-4 col-lg-2">
+        {{ search_form.brand_id.label(class="form-label small text-muted") }}
+        {{ search_form.brand_id(class="form-select") }}
+      </div>
+      <div class="col-md-4 col-lg-2">
+        {{ search_form.body_type.label(class="form-label small text-muted") }}
+        {{ search_form.body_type(class="form-select") }}
+      </div>
+      <div class="col-md-4 col-lg-2">
+        {{ search_form.price_range.label(class="form-label small text-muted") }}
+        {{ search_form.price_range(class="form-select") }}
+      </div>
+      <div class="col-md-4 col-lg-2">
+        {{ search_form.sort.label(class="form-label small text-muted") }}
+        {{ search_form.sort(class="form-select") }}
+      </div>
+      <div class="col-md-4 col-lg-1 d-grid">
+        <button type="submit" class="btn btn-gold">Lọc</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+    <span>Tìm thấy <strong class="text-light">{{ pagination.total }}</strong> mẫu xe phù hợp (Trang {{ pagination.page }}/{{ pagination.pages or 1 }})</span>
+    {% if query_params %}
+      <a href="{{ url_for('main.car_list') }}" class="text-gold">✕ Xóa bộ lọc tìm kiếm</a>
+    {% endif %}
+  </div>
+
+  {% if cars %}
+    <div class="row g-4">
+      {% for car in cars %}
+        <div class="col-md-6 col-lg-4">
+          {% include 'partials/_car_card.html' %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Phân trang chuẩn SQLAlchemy paginate() -->
+    {% if pagination.pages > 1 %}
+      <nav aria-label="Phân trang danh sách xe">
+        <ul class="pagination">
+          <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('main.car_list', page=pagination.prev_num, **query_params) }}">« Trước</a>
+          </li>
+          {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if p %}
+              <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('main.car_list', page=p, **query_params) }}">{{ p }}</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">…</span></li>
+            {% endif %}
+          {% endfor %}
+          <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('main.car_list', page=pagination.next_num, **query_params) }}">Sau »</a>
+          </li>
+        </ul>
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="card lux-card p-5 text-center">
+      <h4 class="fw-bold mb-2">Không tìm thấy mẫu xe phù hợp</h4>
+      <p class="text-muted mb-3">Vui lòng thử lại với từ khóa hoặc khoảng giá khác.</p>
+      <div><a href="{{ url_for('main.car_list') }}" class="btn btn-gold">Xem toàn bộ xe</a></div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

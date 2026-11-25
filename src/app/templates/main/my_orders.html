@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Đơn đặt xe & Lịch lái thử | LuxAuto{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-4">Đơn Đặt Xe & Lịch Hẹn Lái Thử Của Tôi</h2>
+
+  <div class="card lux-card p-4 mb-4">
+    <h5 class="fw-bold mb-3">Danh sách Đơn đặt cọc xe sang</h5>
+    {% if orders %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Mã đơn</th>
+              <th>Mẫu xe</th>
+              <th>Tiền cọc (5%)</th>
+              <th>Thanh toán</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in orders %}
+              <tr>
+                <td class="fw-semibold text-gold">{{ o.order_code }}</td>
+                <td>
+                  <a href="{{ url_for('main.car_detail', slug=o.car.slug) }}" class="fw-semibold">{{ o.car.name }}</a>
+                  <div class="small text-muted">{{ o.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+                </td>
+                <td>{{ o.deposit_amount | vnd }}</td>
+                <td>
+                  <span class="badge {{ 'bg-success' if o.payment_status == 'paid' else 'bg-warning text-dark' }}">
+                    {{ 'Đã thanh toán cọc' if o.payment_status == 'paid' else 'Chờ thanh toán' }}
+                  </span>
+                </td>
+                <td><span class="badge bg-info">{{ o.status }}</span></td>
+                <td>
+                  {% if o.payment_status != 'paid' %}
+                    <a href="{{ url_for('main.order_payment_demo', order_id=o.id) }}" class="btn btn-sm btn-gold">Thanh toán QR</a>
+                  {% else %}
+                    <span class="small text-muted">Hoàn tất</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">Bạn chưa có đơn đặt xe nào.</p>
+    {% endif %}
+  </div>
+
+  <div class="card lux-card p-4">
+    <h5 class="fw-bold mb-3">Lịch hẹn lái thử tại Showroom</h5>
+    {% if test_drives %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Mẫu xe</th>
+              <th>Ngày hẹn</th>
+              <th>Khung giờ</th>
+              <th>Điện thoại</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for td in test_drives %}
+              <tr>
+                <td class="fw-semibold">{{ td.car.name }}</td>
+                <td>{{ td.preferred_date.strftime('%d/%m/%Y') }}</td>
+                <td>{{ td.time_slot }}</td>
+                <td>{{ td.phone }}</td>
+                <td>
+                  <span class="badge {{ 'bg-success' if td.status == 'confirmed' else 'bg-secondary' }}">
+                    {{ 'Đã xác nhận' if td.status == 'confirmed' else 'Chờ xác nhận' }}
+                  </span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">Chưa có lịch hẹn lái thử nào.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

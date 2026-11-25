@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Thanh toán đặt cọc Demo {{ order.order_code }} | LuxAuto{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card lux-card shadow p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="badge bg-warning text-dark">CỔNG THANH TOÁN ĐẶT CỌC DEMO</span>
+          <span class="small text-muted">Mã giao dịch: <strong class="text-light">{{ order.order_code }}</strong></span>
+        </div>
+
+        <div class="row g-4 align-items-center">
+          <div class="col-md-7">
+            <h3 class="fw-bold mb-2">{{ order.car.name }}</h3>
+            <p class="text-muted small mb-3">Thương hiệu: {{ order.car.brand.name }} · Khách hàng: {{ current_user.full_name }}</p>
+
+            <div class="spec-box mb-3">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Giá xe niêm yết:</span>
+                <strong>{{ order.total_price | vnd }}</strong>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Số tiền đặt cọc (5%):</span>
+                <strong class="text-gold fs-5">{{ order.deposit_amount | vnd }}</strong>
+              </div>
+              <div class="d-flex justify-content-between small text-muted">
+                <span>Quy đổi ngoại tệ tham chiếu:</span>
+                <span>≈ {{ deposit_usd | usd }} USD</span>
+              </div>
+            </div>
+
+            <form method="post">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-gold w-100 py-2 mb-2">
+                ✓ Xác nhận đã chuyển khoản đặt cọc (Demo)
+              </button>
+              <a href="{{ url_for('main.my_orders') }}" class="btn btn-outline-gold w-100 btn-sm">Thanh toán sau / Xem đơn hàng</a>
+            </form>
+          </div>
+
+          <div class="col-md-5 text-center">
+            <div class="qr-demo-box shadow-sm">
+              <div class="fw-bold small mb-2">VIETQR LUXAUTO DEMO</div>
+              <!-- Mã QR SVG sinh động trực tiếp không phụ thuộc dịch vụ ngoài -->
+              <svg viewBox="0 0 120 120" width="160" height="160" style="border: 1px solid #e5e7eb; padding: 6px; border-radius: 6px;">
+                <rect width="120" height="120" fill="#ffffff"/>
+                <rect x="8" y="8" width="32" height="32" fill="#111827"/>
+                <rect x="13" y="13" width="22" height="22" fill="#ffffff"/>
+                <rect x="18" y="18" width="12" height="12" fill="#111827"/>
+                <rect x="80" y="8" width="32" height="32" fill="#111827"/>
+                <rect x="85" y="13" width="22" height="22" fill="#ffffff"/>
+                <rect x="90" y="18" width="12" height="12" fill="#111827"/>
+                <rect x="8" y="80" width="32" height="32" fill="#111827"/>
+                <rect x="13" y="85" width="22" height="22" fill="#ffffff"/>
+                <rect x="18" y="90" width="12" height="12" fill="#111827"/>
+                <rect x="48" y="12" width="8" height="8" fill="#111827"/>
+                <rect x="62" y="20" width="8" height="16" fill="#111827"/>
+                <rect x="46" y="46" width="28" height="28" fill="#d4af37"/>
+                <text x="60" y="64" text-anchor="middle" font-size="11" font-weight="bold" fill="#111827">LA</text>
+                <rect x="12" y="50" width="24" height="8" fill="#111827"/>
+                <rect x="82" y="52" width="26" height="8" fill="#111827"/>
+                <rect x="50" y="84" width="12" height="24" fill="#111827"/>
+                <rect x="72" y="82" width="36" height="10" fill="#111827"/>
+                <rect x="82" y="98" width="26" height="12" fill="#111827"/>
+              </svg>
+              <div class="small text-muted mt-2">Nội dung CK: <strong>{{ order.order_code }}</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

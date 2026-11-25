@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Quản trị & Thống kê | LuxAuto Admin{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+      <div class="small text-gold text-uppercase fw-semibold">Hệ thống Quản trị Showroom</div>
+      <h2 class="fw-bold mb-0">Bảng Điều Khiển & Thống Kê Kinh Doanh</h2>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('admin.cars') }}" class="btn btn-outline-gold">Quản lý Xe ({{ stats.total_cars }})</a>
+      <a href="{{ url_for('admin.brands') }}" class="btn btn-outline-gold">Thương hiệu ({{ stats.total_brands }})</a>
+      <a href="{{ url_for('admin.orders') }}" class="btn btn-outline-gold">Đơn đặt xe ({{ stats.total_orders }})</a>
+      <a href="{{ url_for('admin.create_car') }}" class="btn btn-gold">+ Thêm xe sang mới</a>
+    </div>
+  </div>
+
+  <!-- Khối chỉ số KPI -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card">
+        <div class="small text-muted">Tổng số mẫu xe sang</div>
+        <div class="fs-3 fw-bold">{{ stats.total_cars }} <span class="fs-5 text-muted">mẫu</span></div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card">
+        <div class="small text-muted">Khách hàng & Quản trị</div>
+        <div class="fs-3 fw-bold">{{ stats.total_users }} <span class="fs-5 text-muted">tài khoản</span></div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card">
+        <div class="small text-muted">Tiền cọc đã thu (5%)</div>
+        <div class="fs-4 fw-bold text-gold">{{ stats.paid_deposit_sum | vnd }}</div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card">
+        <div class="small text-muted">Tổng giá trị đơn xác nhận</div>
+        <div class="fs-4 fw-bold text-light">{{ stats.confirmed_value_sum | vnd }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Khối Biểu đồ trực quan (Chart.js + Canvas Fallback) -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-7">
+      <div class="card lux-card p-4 h-100">
+        <h5 class="fw-bold mb-3">Số lượng mẫu xe theo Thương hiệu</h5>
+        <div style="height: 265px;">
+          <canvas id="brandChart" style="width: 100%; height: 265px;"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card lux-card p-4 h-100">
+        <h5 class="fw-bold mb-3">Cơ cấu trạng thái Đơn đặt xe</h5>
+        <div style="height: 265px;">
+          <canvas id="orderChart" style="width: 100%; height: 265px;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bảng đơn đặt cọc gần đây -->
+  <div class="card lux-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold mb-0">Đơn đặt xe mới nhất</h5>
+      <a href="{{ url_for('admin.orders') }}" class="small text-gold">Xem tất cả →</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Mẫu xe</th>
+            <th>Tiền cọc (5%)</th>
+            <th>Thanh toán</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in recent_orders %}
+            <tr>
+              <td class="fw-semibold text-gold">{{ o.order_code }}</td>
+              <td>{{ o.user.full_name }} <span class="small text-muted">({{ o.customer_phone }})</span></td>
+              <td>{{ o.car.name }}</td>
+              <td>{{ o.deposit_amount | vnd }}</td>
+              <td><span class="badge {{ 'bg-success' if o.payment_status == 'paid' else 'bg-warning text-dark' }}">{{ o.payment_status }}</span></td>
+              <td><span class="badge bg-info">{{ o.status }}</span></td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="text-muted text-center">Chưa có đơn hàng nào.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/charts_fallback.js') }}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const brandData = {{ brand_chart | tojson }};
+    const orderData = {{ order_chart | tojson }};
+    if (window.renderLuxCharts) {
+      window.renderLuxCharts(brandData, orderData);
+    }
+  });
+</script>
+{% endblock %}

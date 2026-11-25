@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}LuxAuto Showroom — Phân phối Siêu xe & Xe sang Chính hãng{% endblock %}
+{% block content %}
+<section class="lux-hero py-5 mb-5">
+  <div class="container">
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-6">
+        <div class="d-inline-flex align-items-center gap-2 rate-pill mb-3">
+          <span>🌐 Tỷ giá quy đổi:</span>
+          <strong>1 USD = {{ "{:,.0f}".format(rates.usd_to_vnd).replace(",", ".") }} ₫</strong>
+          <span class="text-muted">| 1 EUR = {{ "{:,.0f}".format(rates.eur_to_vnd).replace(",", ".") }} ₫</span>
+        </div>
+        <h1 class="display-5 fw-bold mb-3">
+          Tuyệt tác <span class="text-gold">Siêu Xe & Xe Sang</span> Đẳng Cấp Thượng Lưu
+        </h1>
+        <p class="lead text-muted mb-4">
+          Khám phá bộ sưu tập {{ total_cars }} mẫu xe sang tuyển chọn từ Porsche, Lamborghini, Mercedes-AMG, Audi và Land Rover. Tra cứu giá quy đổi USD trực tuyến, đặt lịch lái thử và đặt cọc nhanh chóng.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{{ url_for('main.car_list') }}" class="btn btn-gold btn-lg">Khám phá Bộ sưu tập</a>
+          <a href="{{ url_for('main.car_list', body_type='Coupe') }}" class="btn btn-outline-gold btn-lg">Siêu xe Coupé</a>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        {% if hero_car %}
+          <div class="position-relative">
+            <img src="{{ hero_car.thumbnail_url }}" alt="{{ hero_car.name }}" class="hero-showcase-img">
+            <div class="p-3 rounded-3 mt-2 d-flex justify-content-between align-items-center spec-box">
+              <div>
+                <div class="small text-gold fw-semibold">{{ hero_car.brand.name }} · Tiêu điểm</div>
+                <div class="fw-bold fs-5">{{ hero_car.name }} ({{ hero_car.year }})</div>
+              </div>
+              <div class="text-end">
+                <div class="fw-bold text-gold">{{ hero_car.price | vnd }}</div>
+                <a href="{{ url_for('main.car_detail', slug=hero_car.slug) }}" class="small text-light">Xem ngay →</a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container mb-5">
+  <div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+      <div class="small text-gold text-uppercase fw-semibold">Đối tác thương hiệu</div>
+      <h3 class="fw-bold mb-0">Các Hãng Xe Danh Tiếng</h3>
+    </div>
+    <a href="{{ url_for('main.car_list') }}" class="btn btn-sm btn-outline-gold">Tất cả hãng →</a>
+  </div>
+  <div class="row g-3">
+    {% for brand in brands %}
+      <div class="col-6 col-md-3 col-lg-2">
+        <a href="{{ url_for('main.car_list', brand_id=brand.id) }}" class="card lux-card p-3 text-center h-100">
+          {% if brand.logo_url %}
+            <img src="{{ brand.logo_url }}" alt="{{ brand.name }}" style="height: 36px; width: 36px; margin: 0 auto 8px;">
+          {% endif %}
+          <div class="fw-semibold">{{ brand.name }}</div>
+          <div class="small text-muted">{{ brand.country }}</div>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container">
+  <div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+      <div class="small text-gold text-uppercase fw-semibold">Tuyển chọn đặc biệt</div>
+      <h3 class="fw-bold mb-0">Mẫu Xe Tiêu Điểm Tại Showroom</h3>
+    </div>
+    <a href="{{ url_for('main.car_list') }}" class="btn btn-sm btn-gold">Xem toàn bộ {{ total_cars }} xe</a>
+  </div>
+
+  <div class="row g-4">
+    {% for car in featured_cars %}
+      <div class="col-md-6 col-lg-4">
+        {% include 'partials/_car_card.html' %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

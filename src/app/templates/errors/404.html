@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}404 — Không tìm thấy trang | LuxAuto{% endblock %}
+{% block content %}
+<div class="container py-5 text-center">
+  <h1 class="display-5 text-gold fw-bold">404 — Không tìm thấy trang</h1>
+  <p class="lead text-muted mb-4">Mẫu xe hoặc đường dẫn bạn yêu cầu không tồn tại trong hệ thống.</p>
+  <a href="{{ url_for('main.car_list') }}" class="btn btn-gold">Xem danh mục xe sang</a>
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý Đơn đặt cọc & Lái thử | LuxAuto Admin{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="mb-4">
+    <a href="{{ url_for('admin.dashboard') }}" class="small text-gold">← Quay lại Dashboard</a>
+    <h2 class="fw-bold mb-0 mt-1">Quản Lý Đơn Đặt Cọc & Lịch Hẹn Lái Thử</h2>
+  </div>
+
+  <div class="card lux-card p-4 mb-4">
+    <h5 class="fw-bold mb-3">Danh sách Đơn đặt mua xe sang</h5>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Mẫu xe</th>
+            <th>Tiền cọc (5%)</th>
+            <th>Cập nhật trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in orders %}
+            <tr>
+              <td class="fw-semibold text-gold">{{ o.order_code }}</td>
+              <td>
+                <div>{{ o.user.full_name }}</div>
+                <div class="small text-muted">{{ o.customer_phone }}</div>
+              </td>
+              <td>{{ o.car.name }}</td>
+              <td>{{ o.deposit_amount | vnd }}</td>
+              <td>
+                <form method="post" action="{{ url_for('admin.update_order_status', order_id=o.id) }}" class="d-flex gap-2 align-items-center">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <select name="payment_status" class="form-select" style="width: 170px;">
+                    <option value="unpaid" {% if o.payment_status == 'unpaid' %}selected{% endif %}>Chưa thu cọc</option>
+                    <option value="paid" {% if o.payment_status == 'paid' %}selected{% endif %}>Đã thu cọc</option>
+                  </select>
+                  <select name="status" class="form-select" style="width: 165px;">
+                    <option value="pending" {% if o.status == 'pending' %}selected{% endif %}>Chờ xác nhận</option>
+                    <option value="confirmed" {% if o.status == 'confirmed' %}selected{% endif %}>Đã xác nhận</option>
+                    <option value="completed" {% if o.status == 'completed' %}selected{% endif %}>Đã bàn giao</option>
+                    <option value="cancelled" {% if o.status == 'cancelled' %}selected{% endif %}>Đã hủy</option>
+                  </select>
+                  <button type="submit" class="btn btn-sm btn-gold">Lưu</button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5" class="text-center text-muted">Chưa có đơn đặt xe nào.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card lux-card p-4">
+    <h5 class="fw-bold mb-3">Danh sách Lịch hẹn lái thử</h5>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Khách hàng</th>
+            <th>Mẫu xe</th>
+            <th>Ngày & Khung giờ</th>
+            <th>Điện thoại</th>
+            <th>Trạng thái</th>
+            <th class="text-end">Phê duyệt</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for td in test_drives %}
+            <tr>
+              <td>{{ td.user.full_name }}</td>
+              <td>{{ td.car.name }}</td>
+              <td>{{ td.preferred_date.strftime('%d/%m/%Y') }} · {{ td.time_slot }}</td>
+              <td>{{ td.phone }}</td>
+              <td><span class="badge {{ 'bg-success' if td.status == 'confirmed' else 'bg-secondary' }}">{{ td.status }}</span></td>
+              <td class="text-end">
+                {% if td.status != 'confirmed' %}
+                  <form method="post" action="{{ url_for('admin.approve_test_drive', td_id=td.id) }}" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-outline-gold">Duyệt lịch</button>
+                  </form>
+                {% else %}
+                  <span class="small text-muted">Đã duyệt</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="text-center text-muted">Chưa có yêu cầu lái thử nào.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

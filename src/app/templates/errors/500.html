@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}500 — Lỗi hệ thống | LuxAuto{% endblock %}
+{% block content %}
+<div class="container py-5 text-center">
+  <h1 class="display-5 text-danger fw-bold">500 — Lỗi máy chủ nội bộ</h1>
+  <p class="lead text-muted mb-4">Đã xảy ra sự cố ngoài ý muốn. Phiên giao dịch dữ liệu đã được khôi phục an toàn.</p>
+  <a href="{{ url_for('main.index') }}" class="btn btn-gold">Quay về Trang chủ</a>
+</div>
+{% endblock %}
